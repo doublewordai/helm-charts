@@ -71,11 +71,11 @@ spec:
           name: postgres-mongodb-feedback-exporter
       {{- end }}
       - name: server-data
-        {{- if not .Values.server.useDataCache }}
+        {{- if not .Values.server.dataCache.enabled }}
         emptyDir: {}
         {{- else }}
         persistentVolumeClaim:
-          claimName: {{ include "rag.fullname" $ }}-server-data
+          claimName: {{ .Values.server.dataCache.persistentVolumeClaim }}
         {{- end }}
       {{- with .Values.server.volumes }}
       {{- toYaml . | nindent 6 }}

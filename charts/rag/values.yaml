@@ -88,8 +88,11 @@ server:
       path: /healthz
       port: http
 
-  useDataCache: true
-  
+  # This is if the server should store a persistent volume for its data
+  dataCache:
+    enabled: false
+    persistentVolumeClaim: rag-server-data
+
   configMaps:
     server-config:
       data:
