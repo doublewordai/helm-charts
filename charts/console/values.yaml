@@ -237,17 +237,21 @@ secret:
 rproxy:
   enabled: true
   replicaCount: 1
+
   image:
     repository: tytn/zeus-proxy
     tag: 0.2.0
     pullPolicy: IfNotPresent
+
   service:
     type: ClusterIP
+    annotations: {}
     ports:
       - port: 80
         targetPort: http
         protocol: TCP
         name: http
+
   resources: {}
   nodeSelector: {}
   tolerations: []
