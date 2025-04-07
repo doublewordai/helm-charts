@@ -50,7 +50,7 @@ metadata:
   labels:
     {{- include "console.labels" . | nindent 4 }}
     app.kubernetes.io/component: rproxy
-  {{- with .Values.rpoxy.service.annotations }}
+  {{- with .Values.rproxy.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
