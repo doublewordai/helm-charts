@@ -170,7 +170,7 @@ server:
   - name: LOGURU_LEVEL
     value: "DEBUG"
   - name: TAKEOFF_HOST
-    value: rag-gateway
+    value: management-console-stack-gateway
   - name: TAKEOFF_PORT
     value: "3000"
   - name: TAKEOFF_MANAGEMENT_PORT
