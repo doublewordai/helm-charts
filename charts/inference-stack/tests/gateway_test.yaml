@@ -60,7 +60,7 @@ tests:
   asserts:
   - equal:
       path: spec.template.spec.containers[0].image
-      value: "tytn/takeoff-pro:0.22.0-rc19-cpu"
+      value: "tytn/takeoff-pro:0.22.0-rc20-cpu"
   - equal:
       path: spec.template.spec.containers[0].imagePullPolicy
       value: "IfNotPresent"
