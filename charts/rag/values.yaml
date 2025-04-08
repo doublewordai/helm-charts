@@ -170,7 +170,7 @@ server:
   - name: LOGURU_LEVEL
     value: "DEBUG"
   - name: TAKEOFF_HOST
-    value: management-console-stack-gateway
+    value: console-stack-gateway
   - name: TAKEOFF_PORT
     value: "3000"
   - name: TAKEOFF_MANAGEMENT_PORT
@@ -201,5 +201,5 @@ secret:
     githubToken: GITHUB_TOKEN
     mongoDbPassword: MONGODB_PASSWORD
     mongoDbConnectionString: MONGODB_CONNECTION_STRING
-    internalDbPassword: INTERNAL_DB_PASSWORD
-    internalDbUser: INTERNAL_DB_USER
+    internalDbPassword: INTERNAL_DATABASE_PASSWORD
+    internalDbUser: INTERNAL_DATABASE_USER
