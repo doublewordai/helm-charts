@@ -51,7 +51,7 @@ Internal Database Name
 {{- define "rag.internalDbName" -}}
 # loop over env vars
 {{- $return := "" }}
-{{- range $envMap := .Values.server.env }}
+{{- range $envMap := .Values.env }}
 {{- if eq $envMap.name "INTERNAL_DB_NAME" }}
 {{- $return := $envMap.name }}
 {{- end }}
@@ -67,7 +67,7 @@ Internal Database Name
 {{/* 
 Create Backend Environment Variables for Zeus 
 */}}
-{{- define "rag.serverBackendEnv" -}}
+{{- define "rag.BackendEnv" -}}
 
 {{/* 
 Create a template for necessary environment variables for Zeus backend 
@@ -88,7 +88,7 @@ Create a template for necessary environment variables for Zeus backend
 Convert user set env vars into dict 
 */}}
 {{- $userEnv := dict }}
-{{- range $envMap := .Values.server.env }}
+{{- range $envMap := .Values.env }}
 {{- if hasKey $envMap "value" }}
     {{- $_ := set $userEnv $envMap.name (dict "value" $envMap.value) }}
 {{ else if hasKey $envMap "valueFrom" }}
@@ -99,20 +99,20 @@ Convert user set env vars into dict
 {{/* 
 Define the list to hold the env 
 */}}
-{{- $serverBackendEnv := list }}
+{{- $BackendEnv := list }}
 {{/* Merge the template env with user env. Lets users overwrite default values. */}}
-{{- $serverBackendEnvDict := merge $userEnv $templateEnv }}
+{{- $BackendEnvDict := merge $userEnv $templateEnv }}
 
 {{/* 
 Loop through the merged env and append to the list 
 */}}
-{{- range $key, $value := $serverBackendEnvDict }}
+{{- range $key, $value := $BackendEnvDict }}
     {{- if $value.value }}
-        {{- $serverBackendEnv = append $serverBackendEnv (dict "name" $key "value" $value.value) }}
+        {{- $BackendEnv = append $BackendEnv (dict "name" $key "value" $value.value) }}
     {{- else if $value.valueFrom }}
-        {{- $serverBackendEnv = append $serverBackendEnv (dict "name" $key "valueFrom" $value.valueFrom) }}
+        {{- $BackendEnv = append $BackendEnv (dict "name" $key "valueFrom" $value.valueFrom) }}
     {{- end }}
 {{- end }}
 
-{{- $serverBackendEnv | toYaml }}
+{{- $BackendEnv | toYaml }}
 {{- end }}

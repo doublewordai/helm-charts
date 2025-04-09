@@ -3,22 +3,22 @@ kind: Service
 metadata:
   name: {{ include "rag.fullname" $ }}
   labels:
-    app.kubernetes.io/component: server
+    app.kubernetes.io/component: rag
     {{- include "rag.labels" $ | nindent 4 }}
-  {{- with .Values.server.service.annotations }}
+  {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   ports:
-    {{- range $port := .Values.server.ports }}
+    {{- range $port := .Values.ports }}
     - port: {{ $port.containerPort }}
       targetPort: http
       protocol: {{ $port.protocol }}
       name: {{ $port.name }}
     {{- end }}
   selector:
-    app.kubernetes.io/component: server
+    app.kubernetes.io/component: rag
     {{- include "rag.selectorLabels" $ | nindent 4 }}
 ---
 {{- if .Values.enableAWSLoadBalancer }}
@@ -38,7 +38,7 @@ spec:
       protocol: TCP
       name: api
   selector:
-    app.kubernetes.io/component: server
+    app.kubernetes.io/component: rag
 ---
 {{- end }}
 apiVersion: v1
