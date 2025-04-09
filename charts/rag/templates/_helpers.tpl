@@ -78,10 +78,10 @@ Create a template for necessary environment variables for Zeus backend
 {{- $_ := set $templateEnv "GITHUB_TOKEN" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.githubToken))) }}
 {{- $_ := set $templateEnv "MONGODB_PASSWORD" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.mongoDbPassword))) }}
 {{- $_ := set $templateEnv "MONGODB_CONNECTION_STRING" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.mongoDbConnectionString))) }}
-{{- $_ := set $templateEnv "MONGODB_FEEDBACK_DB_NAME" (dict "value" (printf "%s-feedback" (include "rag.fullname" .))) }}
+{{- $_ := set $templateEnv "MONGODB_FEEDBACK_DATABASE_NAME" (dict "value" (printf "%s-feedback" (include "rag.fullname" .))) }}
 {{- $_ := set $templateEnv "INTERNAL_DATABASE_PASSWORD" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.internalDbPassword))) }}
 {{- $_ := set $templateEnv "INTERNAL_DATABASE_USER" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.internalDbUser))) }}
-{{- $_ := set $templateEnv "INTERNAL_DB_HOST" (dict "value" (printf "%s-postgres" (include "rag.fullname" .))) }}
+{{- $_ := set $templateEnv "INTERNAL_DATABASE_HOST" (dict "value" (printf "%s-postgres" (include "rag.fullname" .))) }}
 {{- $_ := set $templateEnv "FEEDBACK_EXPORT_INTERVAL" (dict "value" (printf "%s-postgres" (include "rag.fullname" .))) }}
 
 {{/* 

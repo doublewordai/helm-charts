@@ -176,5 +176,5 @@ secret:
     githubToken: GITHUB_TOKEN
     mongoDbPassword: MONGODB_PASSWORD
     mongoDbConnectionString: MONGODB_CONNECTION_STRING
-    internalDbPassword: INTERNAL_DB_PASSWORD
-    internalDbUser: INTERNAL_DB_USER
+    internalDbPassword: INTERNAL_DATABASE_PASSWORD
+    internalDbUser: INTERNAL_DATABASE_USER
