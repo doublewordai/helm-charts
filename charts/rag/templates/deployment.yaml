@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "rag.fullname" $ }}-rag
+  name: {{ include "rag.fullname" $ }}-server
   labels:
     {{- include "rag.labels" $ | nindent 4 }}
     app.kubernetes.io/component: rag
