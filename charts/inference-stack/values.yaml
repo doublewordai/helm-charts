@@ -242,7 +242,7 @@ applicationTemplate:
     #   memory: 128Mi
 
   # This is to setup the shared memory size for the container. It is especially important for multi-gpu setups, but can be used by some engines for single gpu setups as well.
-  shmSize:
+  shmSize: 2Gi
 
   # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   livenessProbe:
