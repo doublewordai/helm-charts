@@ -126,7 +126,7 @@ tests:
       - equal:
           path: spec.template.spec.volumes[?(@.name=="models-custom")].hostPath.type
           value: DirectoryOrCreate
-      - notExists:
+      - isNull:
           path: spec.template.spec.volumes[?(@.name=="models-template")]
       - equal:
           path: spec.template.spec.containers[0].volumeMounts[?(@.mountPath=="/code/models")].name
@@ -153,7 +153,7 @@ tests:
       - equal:
           path: spec.template.spec.volumes[?(@.name=="models-custom")].hostPath.path
           value: /custom/models/path
-      - notExists:
+      - isNull:
           path: spec.template.spec.volumes[?(@.name=="models-custom")].emptyDir
       - equal:
           path: spec.template.spec.initContainers[0].volumeMounts[0].name
