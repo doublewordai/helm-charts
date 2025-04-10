@@ -1,15 +1,15 @@
-{{- range $map_name, $payload := .Values.server.configMaps }}
+{{- range $map_name, $payload := .Values.configMaps }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ $map_name }}
   labels:
-    app.kubernetes.io/component: server
+    app.kubernetes.io/component: rag
     {{- include "rag.labels" $ | nindent 4 }}
 {{ toYaml $payload }}
 ---
 {{- end}}
-{{- if .Values.server.exportFeedback}}
+{{- if .Values.exportFeedback}}
 apiVersion: v1
 kind: ConfigMap
 metadata:

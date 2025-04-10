@@ -1,5 +1,8 @@
 gpuOperator:
-  enabled: true
+  enabled: false
 
 argocd:
   enabled: true
+
+catalog:
+  enabled: false

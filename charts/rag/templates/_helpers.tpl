@@ -51,7 +51,7 @@ Internal Database Name
 {{- define "rag.internalDbName" -}}
 # loop over env vars
 {{- $return := "" }}
-{{- range $envMap := .Values.server.env }}
+{{- range $envMap := .Values.env }}
 {{- if eq $envMap.name "INTERNAL_DB_NAME" }}
 {{- $return := $envMap.name }}
 {{- end }}
@@ -67,7 +67,7 @@ Internal Database Name
 {{/* 
 Create Backend Environment Variables for Zeus 
 */}}
-{{- define "rag.serverBackendEnv" -}}
+{{- define "rag.BackendEnv" -}}
 
 {{/* 
 Create a template for necessary environment variables for Zeus backend 
@@ -78,17 +78,17 @@ Create a template for necessary environment variables for Zeus backend
 {{- $_ := set $templateEnv "GITHUB_TOKEN" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.githubToken))) }}
 {{- $_ := set $templateEnv "MONGODB_PASSWORD" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.mongoDbPassword))) }}
 {{- $_ := set $templateEnv "MONGODB_CONNECTION_STRING" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.mongoDbConnectionString))) }}
-{{- $_ := set $templateEnv "MONGODB_FEEDBACK_DB_NAME" (dict "value" (printf "%s-feedback" (include "rag.fullname" .))) }}
+{{- $_ := set $templateEnv "MONGODB_FEEDBACK_DATABASE_NAME" (dict "value" (printf "%s-feedback" (include "rag.fullname" .))) }}
 {{- $_ := set $templateEnv "INTERNAL_DATABASE_PASSWORD" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.internalDbPassword))) }}
 {{- $_ := set $templateEnv "INTERNAL_DATABASE_USER" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.internalDbUser))) }}
-{{- $_ := set $templateEnv "INTERNAL_DB_HOST" (dict "value" (printf "%s-postgres" (include "rag.fullname" .))) }}
+{{- $_ := set $templateEnv "INTERNAL_DATABASE_HOST" (dict "value" (printf "%s-postgres" (include "rag.fullname" .))) }}
 {{- $_ := set $templateEnv "FEEDBACK_EXPORT_INTERVAL" (dict "value" (printf "%s-postgres" (include "rag.fullname" .))) }}
 
 {{/* 
 Convert user set env vars into dict 
 */}}
 {{- $userEnv := dict }}
-{{- range $envMap := .Values.server.env }}
+{{- range $envMap := .Values.env }}
 {{- if hasKey $envMap "value" }}
     {{- $_ := set $userEnv $envMap.name (dict "value" $envMap.value) }}
 {{ else if hasKey $envMap "valueFrom" }}
@@ -99,20 +99,20 @@ Convert user set env vars into dict
 {{/* 
 Define the list to hold the env 
 */}}
-{{- $serverBackendEnv := list }}
+{{- $BackendEnv := list }}
 {{/* Merge the template env with user env. Lets users overwrite default values. */}}
-{{- $serverBackendEnvDict := merge $userEnv $templateEnv }}
+{{- $BackendEnvDict := merge $userEnv $templateEnv }}
 
 {{/* 
 Loop through the merged env and append to the list 
 */}}
-{{- range $key, $value := $serverBackendEnvDict }}
+{{- range $key, $value := $BackendEnvDict }}
     {{- if $value.value }}
-        {{- $serverBackendEnv = append $serverBackendEnv (dict "name" $key "value" $value.value) }}
+        {{- $BackendEnv = append $BackendEnv (dict "name" $key "value" $value.value) }}
     {{- else if $value.valueFrom }}
-        {{- $serverBackendEnv = append $serverBackendEnv (dict "name" $key "valueFrom" $value.valueFrom) }}
+        {{- $BackendEnv = append $BackendEnv (dict "name" $key "valueFrom" $value.valueFrom) }}
     {{- end }}
 {{- end }}
 
-{{- $serverBackendEnv | toYaml }}
+{{- $BackendEnv | toYaml }}
 {{- end }}
