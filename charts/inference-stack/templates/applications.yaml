@@ -177,6 +177,9 @@ spec:
         - name: dshm
           emptyDir:
             medium: Memory
+            {{- if $mergedValues.shmSize }}
+            sizeLimit: {{ $mergedValues.shmSize }}
+            {{- end }}
         - {{- $mergedValues.modelsVolume | toYaml | nindent 10 }}
       {{- with $mergedValues.volumes }}
         {{- toYaml . | nindent 8 }}

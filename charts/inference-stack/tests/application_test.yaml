@@ -143,6 +143,7 @@ tests:
         name: dshm
         emptyDir:
           medium: Memory
+          sizeLimit: 2Gi
   - contains:
       path: spec.template.spec.containers[0].volumeMounts
       content:
