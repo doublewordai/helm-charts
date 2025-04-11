@@ -21,26 +21,6 @@ spec:
     app.kubernetes.io/component: rag
     {{- include "rag.selectorLabels" $ | nindent 4 }}
 ---
-{{- if .Values.enableAWSLoadBalancer }}
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-type: "external"
-    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
-    helm.sh/resource-policy: keep
-  name: takeoff-server-lb
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 8000
-      targetPort: 8000
-      protocol: TCP
-      name: api
-  selector:
-    app.kubernetes.io/component: rag
----
-{{- end }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -53,3 +33,17 @@ spec:
   - port: 5432
   selector:
     app.kubernetes.io/component: postgres
+---
+{{- range $loadBalancer := .Values.additionalServices }}
+apiVersion: v1
+kind: Service
+metadata:
+  {{- with $loadBalancer.annotations }}
+  annotations: 
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ $loadBalancer.name }}
+spec:
+  {{ $loadBalancer.spec | nindent 2 }}
+---
+{{- end }}

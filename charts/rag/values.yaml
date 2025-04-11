@@ -10,8 +10,6 @@ nameOverride: ""
 fullnameOverride: ""
 # If a job should be spawned to export feedback data from internal db to remote db
 exportFeedback: false
-# If the server should be exposed via an AWS LoadBalancer
-enableAWSLoadBalancer: false
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
@@ -54,6 +52,23 @@ service:
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 80
   annotations: 
+
+# Extra services to be deployed alongside the main deployment, for instance application load balancers
+additionalServices: []
+  # - name: takeoff-server-lb
+  #   annotations:
+  #     service.beta.kubernetes.io/aws-load-balancer-type: "external"
+  #     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+  #     helm.sh/resource-policy: keep
+  #   spec:
+  #     type: LoadBalancer
+  #     ports:
+  #       - port: 8000
+  #         targetPort: 8000
+  #         protocol: TCP
+  #         name: api
+  #     selector:
+  #       app.kubernetes.io/component: rag
 
 resources:
   limits:
