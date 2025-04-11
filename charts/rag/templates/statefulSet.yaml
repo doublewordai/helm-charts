@@ -3,18 +3,20 @@ kind: StatefulSet
 metadata:
   name: {{ include "rag.fullname" $ }}-postgres
   labels:
-    app.kubernetes.io/component: postgres
+    app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
     {{- include "rag.labels" $ | nindent 4 }}
 spec:
   serviceName: {{ include "rag.fullname" $ }}-postgres
   replicas: 1
   selector:
     matchLabels:
-      app: {{ include "rag.fullname" $ }}-postgres
+      {{- include "rag.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
   template:
     metadata:
       labels:
-        app: {{ include "rag.fullname" $ }}-postgres
+        {{- include "rag.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
     spec:
       containers:
       - name: postgres
@@ -43,6 +45,9 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: {{ include "rag.fullname" $ }}-postgres
+      labels:
+        {{- include "rag.labels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
