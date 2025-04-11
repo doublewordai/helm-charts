@@ -4,16 +4,18 @@ metadata:
   name: {{ include "rag.fullname" $ }}-server
   labels:
     {{- include "rag.labels" $ | nindent 4 }}
-    app.kubernetes.io/component: rag
+    app.kubernetes.io/component: {{ include "rag.fullname" $ }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "rag.fullname" $ }}
+      {{- include "rag.selectorLabels" $ | nindent 6 }}
+      app.kubernetes.io/component: {{ include "rag.fullname" $ }}
   template:
     metadata:
       labels:
-        app: {{ include "rag.fullname" $ }}
+        app.kubernetes.io/component: {{ include "rag.fullname" $ }}
+        {{- include "rag.labels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
