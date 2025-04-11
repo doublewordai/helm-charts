@@ -100,9 +100,11 @@ livenessProbe:
   timeoutSeconds: 10
   failureThreshold: 10
 readinessProbe:
-  httpGet:
-    path: /healthz
-    port: http
+  exec:
+    command:
+    - sh
+    - -c
+    - "curl -f -u $APP_USERNAME:$APP_PASSWORD http://localhost:8000/api/v1/healthz"
 
 # This is if the server should store a persistent volume for its data
 dataCache:
