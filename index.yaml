@@ -25,6 +25,17 @@ entries:
     version: 0.1.0
   console:
   - apiVersion: v2
+    appVersion: 0.3.9
+    created: "2025-04-15T16:09:09.120291316Z"
+    description: A Helm chart to deploy the console which controls a Inference Stack.
+    digest: d21df6f4bd6e1b9a6ddc50b405e59bbd96e2755a119f2bdb99d393aa3f84be2b
+    icon: https://raw.githubusercontent.com/titanml/titanml-public-assets/refs/heads/master/TitanML-Icon-1000x1001.png
+    name: console
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/console-1.1.0/console-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
     appVersion: 0.3.2
     created: "2025-04-03T15:45:48.378157209Z"
     description: A Helm chart to deploy the console which controls a Inference Stack.
@@ -165,6 +176,18 @@ entries:
     - https://github.com/titanml/helm-charts/releases/download/monitoring-0.1.0/monitoring-0.1.0.tgz
     version: 0.1.0
   rag:
+  - apiVersion: v2
+    appVersion: 0.19.21
+    created: "2025-04-15T16:09:09.285834911Z"
+    description: A Helm chart for deploying the RAG (Retrieval-Augmented Generation)
+      application.
+    digest: d02814b29f15b3f3783b41f95ccabc6e12e934a52bda7e68919950e69b46b542
+    icon: https://raw.githubusercontent.com/titanml/titanml-public-assets/refs/heads/master/TitanML-Icon-1000x1001.png
+    name: rag
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/rag-1.0.0/rag-1.0.0.tgz
+    version: 1.0.0
   - apiVersion: v2
     appVersion: 0.19.20
     created: "2025-04-11T08:32:54.271219797Z"
@@ -1098,4 +1121,4 @@ entries:
     urls:
     - https://github.com/titanml/helm-charts/releases/download/takeoff-system-0.1.0/takeoff-system-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-11T08:32:54.271419166Z"
+generated: "2025-04-15T16:09:09.286025347Z"
