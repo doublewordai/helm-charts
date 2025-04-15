@@ -35,13 +35,10 @@ releases:
   installed: {{ .Values.signoz.enabled }}
   version: 0.76.1
   namespace: monitoring
-  set:
-    - name: alertmanager.config.global.slack_api_url
-      value: '{{ env "SLACK_WEBHOOK" | default "" }}'
   hooks:
     - events: ["postsync"]
       command: "./scripts/setup-alerts.sh"
-      args: ['{{ env "SIGNOZ_EMAIL" }}', '{{ env "SIGNOZ_PASSWORD" }}']
+      args: ['{{ env "SIGNOZ_EMAIL" }}', '{{ env "SIGNOZ_PASSWORD" }}', '{{ env "SLACK_WEBHOOK" }}']
 
 - name: signoz-infra
   chart: signoz/k8s-infra
