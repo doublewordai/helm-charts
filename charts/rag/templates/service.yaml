@@ -44,6 +44,6 @@ metadata:
   {{- end }}
   name: {{ $loadBalancer.name }}
 spec:
-  {{ $loadBalancer.spec | nindent 2 }}
+  {{- toYaml $loadBalancer.spec | nindent 2 }}
 ---
 {{- end }}
