@@ -111,6 +111,9 @@ dataCache:
   enabled: false
   persistentVolumeClaim: rag-server-data
 
+serviceMonitor:
+  enabled: false
+
 configMaps:
   server-config:
     data:

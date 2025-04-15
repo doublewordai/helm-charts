@@ -45,6 +45,7 @@ ingress:
 inferenceStack:
   crdVersion: v1alpha1
   operatorVersion: v2
+  exportPrometheusMetrics: false
 
 backend:
   # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
