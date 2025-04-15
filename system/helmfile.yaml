@@ -23,11 +23,36 @@ releases:
   chart: doublewordai/monitoring
   version: 1.0.0
   namespace: monitoring
+  installed: {{ .Values.prometheus.enabled }}
   set:
   - name: kube-prometheus-stack.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.metadata.namespace
     value: monitoring
   - name: kube-prometheus-stack.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName
     value: {{ requiredEnv "PROMETHEUS_STORAGE_CLASS" }}
+
+- name: signoz
+  chart: signoz/signoz
+  installed: {{ .Values.signoz.enabled }}
+  version: 0.76.1
+  namespace: monitoring
+  set:
+    - name: alertmanager.config.global.slack_api_url
+      value: '{{ env "SLACK_WEBHOOK" | default "" }}'
+  hooks:
+    - events: ["postsync"]
+      command: "./scripts/setup-alerts.sh"
+      args: ['{{ env "SIGNOZ_EMAIL" }}', '{{ env "SIGNOZ_PASSWORD" }}']
+
+- name: signoz-infra
+  chart: signoz/k8s-infra
+  installed: {{ .Values.signoz.enabled }}
+  version: 0.12.1
+  namespace: monitoring
+  set:
+    - name: otelCollectorEndpoint
+      value: signoz-otel-collector.monitoring.svc.cluster.local:4317
+    - name: otelAgent.enabled
+      value: false
 
 - name: catalog
   chart: doublewordai/catalog

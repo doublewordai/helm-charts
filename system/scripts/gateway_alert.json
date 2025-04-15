@@ -1,0 +1,99 @@
+{
+  "id": "3",
+  "state": "inactive",
+  "alert": "Gateway Down",
+  "alertType": "METRIC_BASED_ALERT",
+  "ruleType": "threshold_rule",
+  "evalWindow": "5m0s",
+  "condition": {
+    "compositeQuery": {
+      "builderQueries": {
+        "A": {
+          "queryName": "A",
+          "stepInterval": 60,
+          "dataSource": "metrics",
+          "aggregateOperator": "latest",
+          "aggregateAttribute": {
+            "key": "k8s_deployment_available",
+            "dataType": "float64",
+            "type": "Gauge",
+            "isColumn": true,
+            "isJSON": false
+          },
+          "filters": {
+            "op": "AND",
+            "items": [
+              {
+                "key": {
+                  "key": "k8s_deployment_name",
+                  "dataType": "string",
+                  "type": "tag",
+                  "isColumn": false,
+                  "isJSON": false
+                },
+                "value": "-stack-gateway",
+                "op": "contains"
+              }
+            ]
+          },
+          "groupBy": [
+            {
+              "key": "k8s_deployment_name",
+              "dataType": "string",
+              "type": "tag",
+              "isColumn": false,
+              "isJSON": false
+            }
+          ],
+          "expression": "A",
+          "disabled": false,
+          "limit": 0,
+          "offset": 0,
+          "pageSize": 0,
+          "reduceTo": "avg",
+          "timeAggregation": "latest",
+          "spaceAggregation": "avg",
+          "ShiftBy": 0,
+          "IsAnomaly": false,
+          "QueriesUsedInFormula": null
+        }
+      },
+      "chQueries": {
+        "A": {
+          "query": "",
+          "disabled": false
+        }
+      },
+      "promQueries": {
+        "A": {
+          "query": "",
+          "disabled": false
+        }
+      },
+      "panelType": "graph",
+      "queryType": "builder"
+    },
+    "op": "2",
+    "target": 0.9,
+    "matchType": "1",
+    "algorithm": "standard",
+    "seasonality": "hourly",
+    "selectedQueryName": "A"
+  },
+  "labels": {
+    "severity": "error"
+  },
+  "annotations": {
+    "description": "This alert is fired when the defined metric (current value: {{$value}}) crosses the threshold ({{$threshold}})",
+    "summary": "The rule threshold is set to {{$threshold}}, and the observed metric value is {{$value}}"
+  },
+  "disabled": false,
+  "preferredChannels": [
+    "stack-down"
+  ],
+  "version": "v4",
+  "createAt": "2025-04-15T16:02:08.952187Z",
+  "createBy": "j@j.com",
+  "updateAt": "2025-04-15T16:02:08.952187Z",
+  "updateBy": "j@j.com"
+}

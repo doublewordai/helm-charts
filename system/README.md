@@ -46,12 +46,15 @@ Before you begin, ensure you have the following installed:
    From this directory, run the following command to deploy all dependencies:
 
    ```bash
-   PROMETHEUS_STORAGE_CLASS="<storage-class>" helmfile sync
+   PROMETHEUS_STORAGE_CLASS="<storage-class>" SIGNOZ_EMAIL="<email>" SIGNOZ_PASSWORD="<password>" helmfile sync
    # `helmfile apply` can be used on a live cluster instead of `sync`: and will only apply changes.
-   # The PROMETHEUS_STORAGE_CLASS environment variable must be supplied.
    ```
+   The PROMETHEUS_STORAGE_CLASS environment variable must be supplied (e.g. mayastor).
+   SIGNOZ_EMAIL and SIGNOZ_PASSWORD are arbitrary here i.e. they are being set for the admin account of the resulting SigNoz installation.
 
-   See `values.yaml` for configuration.
+   You can also pass in `SLACK_WEBHOOK`, which will configure alerts to push to the alerts channel in the relevant server.
+
+   See `values.yaml` for further configuration.
 
 4. **Verify Deployments**
 

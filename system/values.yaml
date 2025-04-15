@@ -6,3 +6,9 @@ argocd:
 
 catalog:
   enabled: false
+
+prometheus:
+  enabled: true
+
+signoz:
+  enabled: true
