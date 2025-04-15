@@ -200,6 +200,18 @@ entries:
   rag:
   - apiVersion: v2
     appVersion: 0.19.21
+    created: "2025-04-15T16:49:00.529098823Z"
+    description: A Helm chart for deploying the RAG (Retrieval-Augmented Generation)
+      application.
+    digest: f9941886221d848c8f7137edf074e30ce1482b7255d3f0f05f81439193579bcf
+    icon: https://raw.githubusercontent.com/titanml/titanml-public-assets/refs/heads/master/TitanML-Icon-1000x1001.png
+    name: rag
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/rag-1.1.0/rag-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
+    appVersion: 0.19.21
     created: "2025-04-15T16:09:09.285834911Z"
     description: A Helm chart for deploying the RAG (Retrieval-Augmented Generation)
       application.
@@ -1143,4 +1155,4 @@ entries:
     urls:
     - https://github.com/titanml/helm-charts/releases/download/takeoff-system-0.1.0/takeoff-system-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-15T16:22:26.619114511Z"
+generated: "2025-04-15T16:49:00.529259945Z"
