@@ -30,7 +30,7 @@ clusterCatalog:
     source:
       type: Image
       image:
-        ref: docker.io/tytn/operator-catalog:2.2.0
+        ref: docker.io/tytn/operator-catalog:2.2.1
         pollIntervalMinutes: 10
 
 # This section is for the cluster extensions that describe how to deploy the operator. More information can be found here: https://operator-framework.github.io/operator-controller/api-reference/operator-controller-api-reference/#clusterextension

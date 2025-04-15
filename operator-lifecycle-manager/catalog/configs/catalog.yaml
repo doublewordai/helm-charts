@@ -19,6 +19,10 @@ schema: olm.channel
 ---
 entries:
 - name: inference-stack-operator.v2.0.0
+- name: inference-stack-operator.v2.2.0
+  replaces: inference-stack-operator.v2.0.0
+  skips:
+  - inference-stack-operator.v2.0.0
 name: stable-v2
 package: inference-stack-operator
 schema: olm.channel
