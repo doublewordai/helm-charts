@@ -1,6 +1,6 @@
 {
-  "id": "3",
-  "state": "inactive",
+  "id": "1",
+  "state": "firing",
   "alert": "Gateway Down",
   "alertType": "METRIC_BASED_ALERT",
   "ruleType": "threshold_rule",
@@ -14,7 +14,7 @@
           "dataSource": "metrics",
           "aggregateOperator": "latest",
           "aggregateAttribute": {
-            "key": "k8s_deployment_available",
+            "key": "k8s_container_restarts",
             "dataType": "float64",
             "type": "Gauge",
             "isColumn": true,
@@ -25,7 +25,7 @@
             "items": [
               {
                 "key": {
-                  "key": "k8s_deployment_name",
+                  "key": "k8s_container_name",
                   "dataType": "string",
                   "type": "tag",
                   "isColumn": false,
@@ -38,7 +38,14 @@
           },
           "groupBy": [
             {
-              "key": "k8s_deployment_name",
+              "key": "k8s_namespace_name",
+              "dataType": "string",
+              "type": "tag",
+              "isColumn": false,
+              "isJSON": false
+            },
+            {
+              "key": "k8s_container_name",
               "dataType": "string",
               "type": "tag",
               "isColumn": false,
@@ -53,6 +60,11 @@
           "reduceTo": "avg",
           "timeAggregation": "latest",
           "spaceAggregation": "avg",
+          "functions": [
+            {
+              "name": "runningDiff"
+            }
+          ],
           "ShiftBy": 0,
           "IsAnomaly": false,
           "QueriesUsedInFormula": null
@@ -73,8 +85,8 @@
       "panelType": "graph",
       "queryType": "builder"
     },
-    "op": "2",
-    "target": 0.9,
+    "op": "1",
+    "target": 0.99,
     "matchType": "1",
     "algorithm": "standard",
     "seasonality": "hourly",
@@ -92,8 +104,8 @@
     "Signoz"
   ],
   "version": "v4",
-  "createAt": "2025-04-15T16:02:08.952187Z",
+  "createAt": "2025-04-15T17:39:43.849313Z",
   "createBy": "j@j.com",
-  "updateAt": "2025-04-15T16:02:08.952187Z",
+  "updateAt": "2025-04-15T18:05:30.666078Z",
   "updateBy": "j@j.com"
 }
