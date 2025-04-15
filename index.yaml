@@ -3,6 +3,17 @@ entries:
   catalog:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2025-04-15T16:17:43.904265438Z"
+    description: A Helm chart for a Cluster Catalog and Cluster Extensions.
+    digest: 20e025b1bda52584ab900c85c138c1f4c8476691a86b77aa46ac5ffdb55bf45b
+    icon: https://raw.githubusercontent.com/titanml/titanml-public-assets/refs/heads/master/TitanML-Icon-1000x1001.png
+    name: catalog
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/catalog-1.1.0/catalog-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2025-04-03T15:45:48.228776996Z"
     description: A Helm chart for a Cluster Catalog and Cluster Extensions.
     digest: 30e400788a32ca7c46a9e4596943243e1c467c06247c055278730b87302d9dc3
@@ -1121,4 +1132,4 @@ entries:
     urls:
     - https://github.com/titanml/helm-charts/releases/download/takeoff-system-0.1.0/takeoff-system-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-15T16:09:09.286025347Z"
+generated: "2025-04-15T16:17:43.904477353Z"
