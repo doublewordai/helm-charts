@@ -10,6 +10,7 @@ nameOverride: ""
 fullnameOverride: ""
 # If a job should be spawned to export feedback data from internal db to remote db
 exportFeedback: false
+dbExistingPvcName: null
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
