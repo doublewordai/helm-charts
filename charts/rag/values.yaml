@@ -10,8 +10,7 @@ nameOverride: ""
 fullnameOverride: ""
 # If a job should be spawned to export feedback data from internal db to remote db
 exportFeedback: false
-# If the server should be exposed via an AWS LoadBalancer
-enableAWSLoadBalancer: false
+dbExistingPvcName: null
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
@@ -55,6 +54,23 @@ service:
   port: 80
   annotations: 
 
+# Extra services to be deployed alongside the main deployment, for instance application load balancers
+additionalServices: []
+  # - name: takeoff-server-lb
+  #   annotations:
+  #     service.beta.kubernetes.io/aws-load-balancer-type: "external"
+  #     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+  #     helm.sh/resource-policy: keep
+  #   spec:
+  #     type: LoadBalancer
+  #     ports:
+  #       - port: 8000
+  #         targetPort: 8000
+  #         protocol: TCP
+  #         name: api
+  #     selector:
+  #       app.kubernetes.io/component: rag
+
 resources:
   limits:
     cpu: 2
@@ -85,14 +101,19 @@ livenessProbe:
   timeoutSeconds: 10
   failureThreshold: 10
 readinessProbe:
-  httpGet:
-    path: /healthz
-    port: http
+  exec:
+    command:
+    - sh
+    - -c
+    - "curl -f -u $APP_USERNAME:$APP_PASSWORD http://localhost:8000/api/v1/healthz"
 
 # This is if the server should store a persistent volume for its data
 dataCache:
   enabled: false
   persistentVolumeClaim: rag-server-data
+
+serviceMonitor:
+  enabled: false
 
 configMaps:
   server-config:
@@ -115,7 +136,7 @@ configMaps:
         }
   prompt-config:
     data:
-      config_server.json: |
+      prompt_config.json: |
         {
           "rag": {
               "system_prompt": "You are a helpful, respectful and honest assistant. Your internal knowledge base was last updated in {December 2023}. If asked about events or news that may have happened after this cutoff date, never claim or imply they are unverified or rumors or that they only allegedly happened or that they are inaccurate, since you cannot know either way and lets the human users know this. Answer user queries using only the provided context. Do not explain who you are or preamble, get straight to answering the question. If the context does not provide enough information, say so. Try to be helpful, knowledgeable, polite, playful, and less formal, yet remains professional. If asked about controversial topics, try to provide careful thoughts and clear information while remaining neutral and objective. Focus on verified facts or widely accepted perspectives. When asked about a very obscure person, object, or topic—where information is rare or unlikely to appear more than once or twice online—end your response by reminding the user that, while you strive for accuracy, you might provide incorrect or hallucinate. Use the term \"hallucinate\" as this is a term the user is likely to understand. Use Markdown for presenting code, structured data, or images in a clear and organized format.",

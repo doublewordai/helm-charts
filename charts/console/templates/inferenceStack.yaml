@@ -10,6 +10,8 @@ spec:
   nameOverride: ""
   # Empty applications object which is populated later
   applications: {}
+  gateway:
+    exportPrometheusMetrics: {{ .Values.inferenceStack.exportPrometheusMetrics }}
   # If we have imagePullSecrets, add them to the CR
   {{- with .Values.imagePullSecrets }}
   imagePullSecrets:

@@ -12,3 +12,4 @@ We only track prod releases here.
 | v0.2.13 | v1alpha1 | - | 20-03-2025 |
 | v1.0.0 | v1alpha1 | Move from `ModelOrchestra` to `InferenceStack`, committed to semantic versioning and intend cluster extensions to be on major channels not specific versions. | 21-03-2025 |
 | v2.0.0 | v1alpha1 | Move CRD from group name `models.titanml.co` to `doublewordai.co` | 03-04-2025 |
+| v2.2.0 | v1alpha1 | Exposing shm size in inference stack chart | 10-04-2025 |
