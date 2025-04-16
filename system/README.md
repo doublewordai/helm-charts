@@ -53,6 +53,8 @@ Before you begin, ensure you have the following installed:
    SIGNOZ_EMAIL and SIGNOZ_PASSWORD are arbitrary here i.e. they are being set for the admin account of the resulting SigNoz installation.
 
    You can also pass in `SLACK_WEBHOOK`, which will configure alerts to push to the alerts channel in the relevant server.
+   Fourth is `INSTALL_RAG_ALERT` which will configure alerts just for a rag server.
+ 
 
    See `values.yaml` for further configuration.
 

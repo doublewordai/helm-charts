@@ -38,7 +38,7 @@ releases:
   hooks:
     - events: ["postsync"]
       command: "./scripts/setup-alerts.sh"
-      args: ['{{ env "SIGNOZ_EMAIL" }}', '{{ env "SIGNOZ_PASSWORD" }}', '{{ env "SLACK_WEBHOOK" }}']
+      args: ['{{ env "SIGNOZ_EMAIL" }}', '{{ env "SIGNOZ_PASSWORD" }}', '{{ env "SLACK_WEBHOOK" }}', '{{ env "INSTALL_RAG_ALERT" }}']
 
 - name: signoz-infra
   chart: signoz/k8s-infra
