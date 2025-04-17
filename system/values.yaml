@@ -6,3 +6,9 @@ argocd:
 
 catalog:
   enabled: false
+
+monitoring:
+  enabled: true
+
+signoz:
+  enabled: true
