@@ -112,6 +112,8 @@ spec:
       {{- end }}
       labels:
         app.kubernetes.io/component: application-{{ $appName }}
+        9-consumerGroup: {{ $mergedValues.readerConfig.consumerGroup | replace "/" "---" | quote }}
+        9-model-name:  {{ $mergedValues.readerConfig.modelName | replace "/" "---" | quote }}
         {{- include "inference-stack.labels" $ | nindent 8 }}
         {{- with $mergedValues.podLabels }}
         {{- toYaml . | nindent 8 }}

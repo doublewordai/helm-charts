@@ -23,7 +23,7 @@ releases:
   chart: doublewordai/monitoring
   version: 1.0.0
   namespace: monitoring
-  installed: {{ .Values.prometheus.enabled }}
+  installed: {{ .Values.monitoring.enabled }}
   set:
   - name: kube-prometheus-stack.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.metadata.namespace
     value: monitoring

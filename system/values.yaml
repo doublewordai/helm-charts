@@ -7,7 +7,7 @@ argocd:
 catalog:
   enabled: false
 
-prometheus:
+monitoring:
   enabled: true
 
 signoz:
