@@ -46,9 +46,10 @@ Before you begin, ensure you have the following installed:
    From this directory, run the following command to deploy all dependencies:
 
    ```bash
-   PROMETHEUS_STORAGE_CLASS="<storage-class>" helmfile sync
+   PROMETHEUS_STORAGE_CLASS="<storage-class>" NVIDIA_TOOLKIT_VERSION="v1.17.5-ubi8" helmfile sync
    # `helmfile apply` can be used on a live cluster instead of `sync`: and will only apply changes.
    # The PROMETHEUS_STORAGE_CLASS environment variable must be supplied.
+   # The NVIDIA_TOOLKIT_VERSION environment variable should be set to work with the nodes in your cluster.
    ```
 
    See `values.yaml` for configuration.

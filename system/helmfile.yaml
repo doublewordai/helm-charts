@@ -57,3 +57,6 @@ releases:
   installed: {{ .Values.gpuOperator.enabled }}
   namespace: gpu-operator
   version: "v24.9.2"
+  set:
+  - name: "toolkit.version"
+    value: {{ requiredEnv "NVIDIA_TOOLKIT_VERSION" }}
