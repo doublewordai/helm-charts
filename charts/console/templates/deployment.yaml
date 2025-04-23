@@ -207,17 +207,19 @@ spec:
           image: "{{ .Values.reverseproxy.image.repository }}:{{ .Values.reverseproxy.image.tag }}"
           imagePullPolicy: {{ .Values.reverseproxy.image.pullPolicy }}
           ports:
-            - name: http
+            - name: https
               containerPort: 443
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /health
-              port: http
+              port: 443
+              scheme: HTTPS
           readinessProbe:
             httpGet:
               path: /health
-              port: http
+              port: 443
+              scheme: HTTPS
           env:
             - name: FRONTEND_SERVICE
               value: {{ include "console.fullname" $ }}-frontend
@@ -232,11 +234,15 @@ spec:
             - name: GATEWAY_PORT
               value: "80"
             - name: TLS_CERTIFICATE_PEM
-              value: |
-                {{ .Values.reverseproxy.tls.certificate | nindent 16 }}
+              valueFrom:
+                secretKeyRef:
+                  name: "zeus-tls"
+                  key: "certificate"
             - name: TLS_PRIVATE_KEY_PEM
-              value: |
-                {{ .Values.reverseproxy.tls.privatekey | nindent 16 }}
+              valueFrom:
+                secretKeyRef:
+                  name: "zeus-tls"
+                  key: "privatekey"
           {{- with .Values.reverseproxy.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
