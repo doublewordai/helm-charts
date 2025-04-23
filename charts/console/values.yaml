@@ -240,7 +240,7 @@ reverseproxy:
   replicaCount: 1
   image:
     repository: tytn/zeus-reverseproxy
-    tag: timtest3
+    tag: ""
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
