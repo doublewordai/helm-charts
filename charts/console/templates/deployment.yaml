@@ -178,7 +178,7 @@ spec:
       app.kubernetes.io/component: reverseproxy
   template:
     metadata:
-      {{- with .Values.rproxy.podAnnotations }}
+      {{- with .Values.reverseproxy.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -231,6 +231,10 @@ spec:
               value: {{ include "console.inferenceStackCRName" $ }}-gateway
             - name: GATEWAY_PORT
               value: "80"
+            - name: TLS_CERTIFICATE_PEM
+              value: "{{ .Values.reverseproxy.tls.certificate }}"
+            - name: TLS_PRIVATE_KEY_PEM
+              value: "{{ .Values.reverseproxy.tls.privatekey }}"
           {{- with .Values.reverseproxy.resources }}
           resources:
             {{- toYaml . | nindent 12 }}

@@ -56,7 +56,7 @@ backend:
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    tag: "timtest3"
   # This is for setting Kubernetes Annotations to a Pod.
   # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   podAnnotations: {}
@@ -242,6 +242,64 @@ reverseproxy:
     repository: tytn/zeus-reverseproxy
     tag: 0.4.6
     pullPolicy: IfNotPresent
+  tls:
+    privatekey: |
+      -----BEGIN EC PRIVATE KEY-----
+      MHcCAQEEINH7vZNj02CgM1NEFaAYT4sfmlimgH1f1KqTnEUVkiHeoAoGCCqGSM49
+      AwEHoUQDQgAEax8OSRTFYjzojCJMNESvSL2r3UDo6rB4rXfa++1UwW14Az8xCtSG
+      3M6hN/D6tHVh7dM7EZJcKj7LFFbbyviBFA==
+      -----END EC PRIVATE KEY-----
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+      MIIDwTCCA0egAwIBAgISBRjou0NYGl6Z91NlQ6l42Tu2MAoGCCqGSM49BAMDMDIx
+      CzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQswCQYDVQQDEwJF
+      NjAeFw0yNTA0MTYxMzA1NDRaFw0yNTA3MTUxMzA1NDNaMCMxITAfBgNVBAMTGHRp
+      dGFuLTMudGFpbDVlZjM1LnRzLm5ldDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IA
+      BGsfDkkUxWI86IwiTDREr0i9q91A6OqweK132vvtVMFteAM/MQrUhtzOoTfw+rR1
+      Ye3TOxGSXCo+yxRW28r4gRSjggJKMIICRjAOBgNVHQ8BAf8EBAMCB4AwHQYDVR0l
+      BBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYE
+      FL+Q53P4EHgaUwVwgt9pFcYT3f8cMB8GA1UdIwQYMBaAFJMnRpgDqVFojpjWxEJI
+      2yO/WJTSMFUGCCsGAQUFBwEBBEkwRzAhBggrBgEFBQcwAYYVaHR0cDovL2U2Lm8u
+      bGVuY3Iub3JnMCIGCCsGAQUFBzAChhZodHRwOi8vZTYuaS5sZW5jci5vcmcvMCMG
+      A1UdEQQcMBqCGHRpdGFuLTMudGFpbDVlZjM1LnRzLm5ldDATBgNVHSAEDDAKMAgG
+      BmeBDAECATAtBgNVHR8EJjAkMCKgIKAehhxodHRwOi8vZTYuYy5sZW5jci5vcmcv
+      NTUuY3JsMIIBBQYKKwYBBAHWeQIEAgSB9gSB8wDxAHcAEvFONL1TckyEBhnDjz96
+      E/jntWKHiJxtMAWE6+WGJjoAAAGWPuomvAAABAMASDBGAiEAhrVVHMhwIKavhtR1
+      R56UxaC1w9dXsMQODCAApjYM0CsCIQDwTzaCoq1kmgm8BuU5ligCjIIuQf+dLVto
+      TwENsR+6JAB2AK8YGijWjKPgqYpMnGerCfi7vCK6rryxOKOhndP5tgMNAAABlj7q
+      Kk0AAAQDAEcwRQIhALDv0UgnMSYiFvklB2kktOiCSgIAMdGVPrRpmeSCIaZbAiBT
+      wtzil8cDRTxU1dauu89Oju+hv4dKrWuaX5QOQaqy+zAKBggqhkjOPQQDAwNoADBl
+      AjEAjHkcSrGs/dezXgYGYjbL/5CnKzQaBiFxtoWVoCjP3qmo2m4zjBMzPo1/B2D0
+      JJRdAjB/CH62dUScj62cJdOx5oq9crnWInAcOPSJpMTQPfAZxXSaPY/br++9Da1U
+      svaFVMk=
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      MIIEVzCCAj+gAwIBAgIRALBXPpFzlydw27SHyzpFKzgwDQYJKoZIhvcNAQELBQAw
+      TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+      cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMjQwMzEzMDAwMDAw
+      WhcNMjcwMzEyMjM1OTU5WjAyMQswCQYDVQQGEwJVUzEWMBQGA1UEChMNTGV0J3Mg
+      RW5jcnlwdDELMAkGA1UEAxMCRTYwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAATZ8Z5G
+      h/ghcWCoJuuj+rnq2h25EqfUJtlRFLFhfHWWvyILOR/VvtEKRqotPEoJhC6+QJVV
+      6RlAN2Z17TJOdwRJ+HB7wxjnzvdxEP6sdNgA1O1tHHMWMxCcOrLqbGL0vbijgfgw
+      gfUwDgYDVR0PAQH/BAQDAgGGMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcD
+      ATASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdDgQWBBSTJ0aYA6lRaI6Y1sRCSNsj
+      v1iU0jAfBgNVHSMEGDAWgBR5tFnme7bl5AFzgAiIyBpY9umbbjAyBggrBgEFBQcB
+      AQQmMCQwIgYIKwYBBQUHMAKGFmh0dHA6Ly94MS5pLmxlbmNyLm9yZy8wEwYDVR0g
+      BAwwCjAIBgZngQwBAgEwJwYDVR0fBCAwHjAcoBqgGIYWaHR0cDovL3gxLmMubGVu
+      Y3Iub3JnLzANBgkqhkiG9w0BAQsFAAOCAgEAfYt7SiA1sgWGCIpunk46r4AExIRc
+      MxkKgUhNlrrv1B21hOaXN/5miE+LOTbrcmU/M9yvC6MVY730GNFoL8IhJ8j8vrOL
+      pMY22OP6baS1k9YMrtDTlwJHoGby04ThTUeBDksS9RiuHvicZqBedQdIF65pZuhp
+      eDcGBcLiYasQr/EO5gxxtLyTmgsHSOVSBcFOn9lgv7LECPq9i7mfH3mpxgrRKSxH
+      pOoZ0KXMcB+hHuvlklHntvcI0mMMQ0mhYj6qtMFStkF1RpCG3IPdIwpVCQqu8GV7
+      s8ubknRzs+3C/Bm19RFOoiPpDkwvyNfvmQ14XkyqqKK5oZ8zhD32kFRQkxa8uZSu
+      h4aTImFxknu39waBxIRXE4jKxlAmQc4QjFZoq1KmQqQg0J/1JF8RlFvJas1VcjLv
+      YlvUB2t6npO6oQjB3l+PNf0DpQH7iUx3Wz5AjQCi6L25FjyE06q6BZ/QlmtYdl/8
+      ZYao4SRqPEs/6cAiF+Qf5zg2UkaWtDphl1LKMuTNLotvsX99HP69V2faNyegodQ0
+      LyTApr/vT01YPE46vNsDLgK+4cL6TrzC/a4WcmF5SRJ938zrv/duJHLXQIku5v0+
+      EwOy59Hdm0PT/Er/84dDV0CSjdR/2XuZM3kpysSKLgD1cKiDA+IRguODCxfO9cyY
+      Ig46v9mFmBvyH04=
+      -----END CERTIFICATE-----
+
   service:
     type: ClusterIP
     annotations: {}
