@@ -232,9 +232,11 @@ spec:
             - name: GATEWAY_PORT
               value: "80"
             - name: TLS_CERTIFICATE_PEM
-              value: "{{ .Values.reverseproxy.tls.certificate }}"
+              value: |
+                {{ .Values.reverseproxy.tls.certificate | nindent 16 }}
             - name: TLS_PRIVATE_KEY_PEM
-              value: "{{ .Values.reverseproxy.tls.privatekey }}"
+              value: |
+                {{ .Values.reverseproxy.tls.privatekey | nindent 16 }}
           {{- with .Values.reverseproxy.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
