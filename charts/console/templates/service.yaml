@@ -42,25 +42,25 @@ spec:
     app.kubernetes.io/component: backend
     {{- include "console.selectorLabels" . | nindent 4 }}
 ---
-{{- if .Values.rproxy.enabled }}
+{{- if .Values.reverseproxy.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "console.fullname" . }}-rproxy
+  name: {{ include "console.fullname" . }}-reverseproxy
   labels:
     {{- include "console.labels" . | nindent 4 }}
-    app.kubernetes.io/component: rproxy
-  {{- with .Values.rproxy.service.annotations }}
+    app.kubernetes.io/component: reverseproxy
+  {{- with .Values.reverseproxy.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.rproxy.service.type }}
-  {{- with .Values.rproxy.service.ports }}
+  type: {{ .Values.reverseproxy.service.type }}
+  {{- with .Values.reverseproxy.service.ports }}
   ports:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   selector:
-    app.kubernetes.io/component: rproxy
+    app.kubernetes.io/component: reverseproxy
     {{- include "console.selectorLabels" . | nindent 4 }}
 {{- end }}
