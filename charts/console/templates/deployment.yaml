@@ -178,7 +178,7 @@ spec:
       app.kubernetes.io/component: reverseproxy
   template:
     metadata:
-      {{- with .Values.rproxy.podAnnotations }}
+      {{- with .Values.reverseproxy.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
