@@ -162,20 +162,20 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 ---
-{{- if .Values.rproxy.enabled }}
+{{- if .Values.reverseproxy.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "console.fullname" $ }}-rproxy
+  name: {{ include "console.fullname" $ }}-reverseproxy
   labels:
     {{- include "console.labels" $ | nindent 4 }}
-    app.kubernetes.io/component: rproxy
+    app.kubernetes.io/component: reverseproxy
 spec:
-  replicas: {{ .Values.rproxy.replicaCount }}
+  replicas: {{ .Values.reverseproxy.replicaCount }}
   selector:
     matchLabels:
       {{- include "console.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: rproxy
+      app.kubernetes.io/component: reverseproxy
   template:
     metadata:
       {{- with .Values.rproxy.podAnnotations }}
@@ -183,9 +183,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        app.kubernetes.io/component: rproxy
+        app.kubernetes.io/component: reverseproxy
         {{- include "console.selectorLabels" $ | nindent 8 }}
-        {{- with .Values.rproxy.podLabels }}
+        {{- with .Values.reverseproxy.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -194,18 +194,18 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "console.serviceAccountName" $ }}
-      {{- with .Values.rproxy.podSecurityContext }}
+      {{- with .Values.reverseproxy.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          {{- with .Values.rproxy.securityContext }}
+          {{- with .Values.reverseproxy.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.rproxy.image.repository }}:{{ .Values.rproxy.image.tag }}"
-          imagePullPolicy: {{ .Values.rproxy.image.pullPolicy }}
+          image: "{{ .Values.reverseproxy.image.repository }}:{{ .Values.reverseproxy.image.tag }}"
+          imagePullPolicy: {{ .Values.reverseproxy.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 80
@@ -231,19 +231,19 @@ spec:
               value: {{ include "console.inferenceStackCRName" $ }}-gateway
             - name: GATEWAY_PORT
               value: "80"
-          {{- with .Values.rproxy.resources }}
+          {{- with .Values.reverseproxy.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.rproxy.nodeSelector }}
+      {{- with .Values.reverseproxy.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.rproxy.affinity }}
+      {{- with .Values.reverseproxy.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.rproxy.tolerations }}
+      {{- with .Values.reverseproxy.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

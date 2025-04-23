@@ -235,15 +235,13 @@ secret:
     dbUser: dbUser
     dbPassword: dbPassword
 
-rproxy:
+reverseproxy:
   enabled: true
   replicaCount: 1
-
   image:
-    repository: tytn/zeus-proxy
-    tag: 0.2.0
+    repository: tytn/zeus-reverseproxy
+    tag: 0.4.6
     pullPolicy: IfNotPresent
-
   service:
     type: ClusterIP
     annotations: {}
