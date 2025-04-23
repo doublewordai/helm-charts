@@ -242,7 +242,6 @@ reverseproxy:
     repository: tytn/zeus-reverseproxy
     tag: 0.4.6
     pullPolicy: IfNotPresent
-
   service:
     type: ClusterIP
     annotations: {}
