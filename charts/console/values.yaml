@@ -56,7 +56,7 @@ backend:
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "timtest3"
+    tag: ""
   # This is for setting Kubernetes Annotations to a Pod.
   # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   podAnnotations: {}
@@ -240,7 +240,7 @@ reverseproxy:
   replicaCount: 1
   image:
     repository: tytn/zeus-reverseproxy
-    tag: 0.4.6
+    tag: timtest3
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP

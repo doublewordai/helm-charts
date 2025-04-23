@@ -208,7 +208,7 @@ spec:
           imagePullPolicy: {{ .Values.reverseproxy.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 443
               protocol: TCP
           livenessProbe:
             httpGet:
