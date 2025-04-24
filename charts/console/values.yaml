@@ -238,9 +238,13 @@ secret:
 reverseproxy:
   enabled: true
   replicaCount: 1
+  secretName: "zeus-tls"
+  keys:
+    certificate: "certificate"
+    privateKey: "privatekey"
   image:
     repository: tytn/zeus-reverseproxy
-    tag: 0.4.6
+    tag: 0.4.7
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
