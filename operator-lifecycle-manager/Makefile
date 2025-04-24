@@ -6,7 +6,7 @@
 
 # IMPORTANT: Respect the semantic versioning rules (https://semver.org) when updating the VERSION. We use major channel subscriptions so any minor or patch updates will be automatically
 # upgraded by the OLM. Only major version updates will require manual intervention to upgrade.
-VERSION ?= 2.2.2
+VERSION ?= 2.2.3
 K8S_SAFE_VERSION := $(shell echo $(VERSION) | tr . -)
 CRD_VERSION ?= v1alpha1
 MAJOR_OPERATOR_VERSION ?= v$(shell echo $(VERSION) | cut -d. -f1)
