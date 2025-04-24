@@ -240,7 +240,7 @@ authentication:
   replicaCount: 1
   image:
     repository: tytn/zeus-authentication
-    tag: 0.4.8
+    tag: 0.4.9
     pullPolicy: IfNotPresent
   sso:
     publicAccess: "true"
@@ -253,33 +253,6 @@ authentication:
     authUrl: "none"
     tokenUrl: "none"
   replicaCount: 1
-  podAnnotations: {}
-  podLabels: {}
-  podSecurityContext: {}
-  securityContext: {}
-  ports:
-    - name: http
-      containerPort: 9090
-      protocol: TCP
-  service:
-    type: ClusterIP   
-    port: 9090
-    annotations:
-  resources: {}
-  livenessProbe:
-    httpGet:
-      path: /healthz
-      port: http
-  readinessProbe:
-    httpGet:
-      path: /healthz
-      port: http
-  volumes: []
-  volumeMounts: []
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
-  env: []
 
 reverseproxy:
   enabled: true
