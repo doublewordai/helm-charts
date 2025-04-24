@@ -236,13 +236,13 @@ spec:
             - name: TLS_CERTIFICATE_PEM
               valueFrom:
                 secretKeyRef:
-                  name: "zeus-tls"
-                  key: "certificate"
+                  name: {{ .Values.reverseproxy.secretName }}
+                  key: {{ .Values.reverseproxy.keys.certificate }}
             - name: TLS_PRIVATE_KEY_PEM
               valueFrom:
                 secretKeyRef:
-                  name: "zeus-tls"
-                  key: "privatekey"
+                  name: {{ .Values.reverseproxy.secretName }}
+                  key: {{ .Values.reverseproxy.keys.privateKey }}
           {{- with .Values.reverseproxy.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
