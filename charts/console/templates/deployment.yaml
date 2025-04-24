@@ -213,12 +213,12 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 443
+              port: https
               scheme: HTTPS
           readinessProbe:
             httpGet:
               path: /health
-              port: 443
+              port: https
               scheme: HTTPS
           env:
             - name: FRONTEND_SERVICE
