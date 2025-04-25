@@ -204,7 +204,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.authentication.image.repository }}:{{ .Values.authentication.image.tag }}"
+          image: "{{ .Values.authentication.image.repository }}:{{ .Values.authentication.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.authentication.image.pullPolicy }}
           ports:
             - name: http
