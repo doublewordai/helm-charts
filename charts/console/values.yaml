@@ -244,8 +244,6 @@ authentication:
     pullPolicy: IfNotPresent
   sso:
     publicAccess: "true"
-    authUrl: ""
-    tokenUrl: ""
     fqdn: "localhost"
     provider: "azure"
     clientId: "none"
@@ -263,7 +261,7 @@ reverseproxy:
     privateKey: "privatekey"
   image:
     repository: tytn/zeus-reverseproxy
-    tag: 0.4.7
+    tag: ""
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
