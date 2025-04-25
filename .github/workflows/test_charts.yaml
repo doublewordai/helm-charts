@@ -3,12 +3,12 @@ name: Inference Stack Helm Chart Tests
 on:
   push:
     branches: [main]
-    paths:
-      - "charts/inference-stack/**"
   pull_request:
-    branches: [main]
-    paths:
-      - "charts/inference-stack/**"
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 jobs:
   helm-unittest-inference-stack:
