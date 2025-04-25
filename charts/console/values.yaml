@@ -235,6 +235,21 @@ secret:
     dbUser: dbUser
     dbPassword: dbPassword
 
+authentication:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: tytn/zeus-authentication
+    tag: 0.4.9
+    pullPolicy: IfNotPresent
+  sso:
+    publicAccess: "true"
+    fqdn: "localhost"
+    provider: "azure"
+    clientId: "none"
+    clientSecret: "none"
+    authUrl: "none"
+    tokenUrl: "none"
 reverseproxy:
   enabled: true
   replicaCount: 1
@@ -244,7 +259,7 @@ reverseproxy:
     privateKey: "privatekey"
   image:
     repository: tytn/zeus-reverseproxy
-    tag: 0.4.7
+    tag: ""
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
