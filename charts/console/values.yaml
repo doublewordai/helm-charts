@@ -250,8 +250,6 @@ authentication:
     clientSecret: "none"
     authUrl: "none"
     tokenUrl: "none"
-  replicaCount: 1
-
 reverseproxy:
   enabled: true
   replicaCount: 1
