@@ -39,6 +39,5 @@
 3. Get the Tailscale address by following these commands
   kubectl get ingress {{ include "console.fullname" . }}-tailscale -n {{ .Release.Namespace }} -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"
 
-
 {{- end }}
 

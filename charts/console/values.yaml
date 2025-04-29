@@ -240,7 +240,7 @@ authentication:
   replicaCount: 1
   image:
     repository: tytn/zeus-authentication
-    tag: 0.4.9
+    tag: ""
     pullPolicy: IfNotPresent
   sso:
     publicAccess: "true"
@@ -254,7 +254,7 @@ authentication:
     port: 9090
     annotations:
     ports:
-      - port: 9090        
+      - port: 9090
 
 reverseproxy:
   enabled: true
@@ -265,7 +265,7 @@ reverseproxy:
     privateKey: "privatekey"
   image:
     repository: tytn/zeus-reverseproxy
-    tag: "test_1745862289"
+    tag: ""
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
