@@ -235,6 +235,7 @@ secret:
     dbUser: dbUser
     dbPassword: dbPassword
 
+
 authentication:
   enabled: true
   replicaCount: 1
@@ -284,3 +285,27 @@ reverseproxy:
 
 tailscale:
   enabled: "true"
+
+# /debug end-point - will show headers (including auth)
+debug:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository:  "mendhak/http-https-echo"
+    tag: "36"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+    ports:
+      - port: 8080
+        targetPort: 8080
+        protocol: TCP
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}

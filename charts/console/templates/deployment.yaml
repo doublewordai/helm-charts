@@ -316,6 +316,10 @@ spec:
               value: {{ include "console.fullname" $ }}-authentication
             - name: AUTHENTICATION_PORT
               value: "{{ .Values.authentication.service.port }}"
+            - name: DEBUG_SERVICE
+              value: {{ include "console.fullname" $ }}-debug
+            - name: DEBUG_PORT
+              value: "{{ .Values.debug.service.port }}"            
             - name: FRONTEND_SERVICE
               value: {{ include "console.fullname" $ }}-frontend
             - name: FRONTEND_PORT
@@ -351,6 +355,83 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.reverseproxy.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end}}
+---
+{{- if .Values.debug.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "console.fullname" $ }}-debug
+  labels:
+    {{- include "console.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: debug
+spec:
+  replicas: {{ .Values.debug.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "console.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: debug
+  template:
+    metadata:
+      {{- with .Values.debug.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/component: debug
+        {{- include "console.selectorLabels" $ | nindent 8 }}
+        {{- with .Values.debug.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "console.serviceAccountName" $ }}
+      {{- with .Values.debug.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.debug.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.debug.image.repository }}:{{ .Values.debug.image.tag }}"
+          imagePullPolicy: {{ .Values.debug.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          env:
+          {{- with .Values.debug.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.debug.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.debug.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.debug.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

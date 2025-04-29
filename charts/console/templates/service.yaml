@@ -82,3 +82,22 @@ spec:
     app.kubernetes.io/component: authentication
     {{- include "console.selectorLabels" . | nindent 4 }}
 {{- end }}
+---
+{{- if .Values.debug.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "console.fullname" . }}-debug
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+    app.kubernetes.io/component: debug
+spec:
+  type: ClusterIP
+  {{- with .Values.debug.service.ports }}
+  ports:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    app.kubernetes.io/component: debug
+    {{- include "console.selectorLabels" . | nindent 4 }}
+{{- end }}
