@@ -312,6 +312,10 @@ spec:
               port: https
               scheme: HTTPS
           env:
+            - name: AUTHENTICATION_SERVICE
+              value: {{ include "console.fullname" $ }}-authentication
+            - name: AUTHENTICATION_PORT
+              value: "{{ .Values.authentication.service.port }}"
             - name: FRONTEND_SERVICE
               value: {{ include "console.fullname" $ }}-frontend
             - name: FRONTEND_PORT

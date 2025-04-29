@@ -10,7 +10,6 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.backend.service.type }}
   ports:
     - port: {{ .Values.frontend.service.port }}
       targetPort: http
@@ -50,17 +49,36 @@ metadata:
   labels:
     {{- include "console.labels" . | nindent 4 }}
     app.kubernetes.io/component: reverseproxy
-  {{- with .Values.reverseproxy.service.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 spec:
-  type: {{ .Values.reverseproxy.service.type }}
+  type: ClusterIP
   {{- with .Values.reverseproxy.service.ports }}
   ports:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   selector:
     app.kubernetes.io/component: reverseproxy
+    {{- include "console.selectorLabels" . | nindent 4 }}
+{{- end }}
+---
+{{- if .Values.authentication.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "console.fullname" . }}-authentication
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+    app.kubernetes.io/component: authentication
+  {{- with .Values.authentication.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.authentication.service.type }}
+  {{- with .Values.authentication.service.ports }}
+  ports:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    app.kubernetes.io/component: authentication
     {{- include "console.selectorLabels" . | nindent 4 }}
 {{- end }}
