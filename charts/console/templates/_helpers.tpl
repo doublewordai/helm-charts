@@ -54,6 +54,14 @@ Create the name of the service account to use
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
+{{- end }}{{/*
+*/}}
+
+{{/*
+Defines the tailscale hostname
+*/}}
+{{- define "console.tailscale" -}}
+{{- printf "%s-%s" (include "console.fullname" .) .Release.Namespace  | quote }}
 {{- end }}
 
 {{/* 

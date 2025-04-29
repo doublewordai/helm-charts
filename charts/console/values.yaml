@@ -250,6 +250,12 @@ authentication:
     clientSecret: "none"
     authUrl: "none"
     tokenUrl: "none"
+  service:
+    port: 9090
+    annotations:
+    ports:
+      - port: 9090        
+
 reverseproxy:
   enabled: true
   replicaCount: 1
@@ -259,17 +265,14 @@ reverseproxy:
     privateKey: "privatekey"
   image:
     repository: tytn/zeus-reverseproxy
-    tag: ""
+    tag: "test_1745862289"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
-    annotations: {}
     ports:
-      - port: 80
-        targetPort: http
+      - port: 443
+        targetPort: 443
         protocol: TCP
-        name: http
-
   resources: {}
   nodeSelector: {}
   tolerations: []
@@ -278,3 +281,6 @@ reverseproxy:
   podLabels: {}
   podSecurityContext: {}
   securityContext: {}
+
+tailscale:
+  enabled: "true"
