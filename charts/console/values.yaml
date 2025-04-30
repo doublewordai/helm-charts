@@ -283,8 +283,10 @@ reverseproxy:
   podSecurityContext: {}
   securityContext: {}
 
+# This chart has a Tailscale ingress
+# This is intended for development only, and requires the Tailscale operator
 tailscale:
-  enabled: "true"
+  enabled: false
 
 # /debug end-point - will show headers (including auth)
 debug:
