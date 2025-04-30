@@ -288,7 +288,7 @@ tailscale:
 
 # /debug end-point - will show headers (including auth)
 debug:
-  enabled: true
+  enabled: false
   replicaCount: 1
   image:
     repository:  "mendhak/http-https-echo"
@@ -309,6 +309,3 @@ debug:
   podLabels: {}
   podSecurityContext: {}
   securityContext: {}
-
-tailscale:
-  enabled: "true"
