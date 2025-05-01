@@ -295,7 +295,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.reverseproxy.image.repository }}:{{ .Values.reverseproxy.image.tag }}"
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.reverseproxy.image.pullPolicy }}
           ports:
             - name: https
