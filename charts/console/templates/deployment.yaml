@@ -295,7 +295,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.reverseproxy.image.repository }}:{{ .Values.reverseproxy.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.reverseproxy.image.pullPolicy }}
           ports:
             - name: https
@@ -316,10 +316,12 @@ spec:
               value: {{ include "console.fullname" $ }}-authentication
             - name: AUTHENTICATION_PORT
               value: "{{ .Values.authentication.service.port }}"
+            {{- if .Values.debug.enabled }}
             - name: DEBUG_SERVICE
               value: {{ include "console.fullname" $ }}-debug
             - name: DEBUG_PORT
-              value: "{{ .Values.debug.service.port }}"            
+              value: "{{ .Values.debug.service.port }}"
+            {{- end}}
             - name: FRONTEND_SERVICE
               value: {{ include "console.fullname" $ }}-frontend
             - name: FRONTEND_PORT
