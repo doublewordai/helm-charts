@@ -290,7 +290,7 @@ tailscale:
 
 # /debug end-point - will show headers (including auth)
 debug:
-  enabled: false
+  enabled: true
   replicaCount: 1
   image:
     repository:  "mendhak/http-https-echo"
