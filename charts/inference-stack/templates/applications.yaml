@@ -24,11 +24,18 @@
     {{- end }}
   {{- end }}
 
-  {{/* Set the required env vars needed for each application deployment */}}
-  {{- $requiredEnv := list }}
-  {{- $requiredEnv = append $requiredEnv (dict "name" "TAKEOFF_ADD_READER_ID_SUFFIX" "value" "true") }}
-  {{- $requiredEnv = append $requiredEnv (dict "name" "TAKEOFF_HEADLESS" "value" "true") }}
-  {{- $requiredEnv = append $requiredEnv (dict "name" "POD_NAME" "valueFrom" (dict "fieldRef" (dict "fieldPath" "metadata.name"))) }}
+  {{/* Set the required env vars needed for the reader container */}}
+  {{- $readerEnv := list }}
+  {{- $readerEnv = append $readerEnv (dict "name" "TAKEOFF_ADD_READER_ID_SUFFIX" "value" "true") }}
+  {{- $readerEnv = append $readerEnv (dict "name" "TAKEOFF_HEADLESS" "value" "false") }}
+  {{- $readerEnv = append $readerEnv (dict "name" "POD_NAME" "valueFrom" (dict "fieldRef" (dict "fieldPath" "metadata.name"))) }}
+
+  {{/* Set the required env vars needed for the manager container */}}
+  {{- $managerEnv := list }}
+  {{- $managerEnv = append $managerEnv (dict "name" "TAKEOFF_ADD_READER_ID_SUFFIX" "value" "true") }}
+  {{- $managerEnv = append $managerEnv (dict "name" "TAKEOFF_HEADLESS" "value" "true") }}
+  {{- $managerEnv = append $managerEnv (dict "name" "TAKEOFF_READER_ENGINE" "value" "sglang") }}
+  {{- $managerEnv = append $managerEnv (dict "name" "POD_NAME" "valueFrom" (dict "fieldRef" (dict "fieldPath" "metadata.name"))) }}
 
   {{/* Process template env */}}
   {{- $templateEnv := list }}
@@ -40,36 +47,63 @@
     {{- $appEnv = $baseValues.env }}
   {{- end }}
 
-  {{/* Create combined env list with overrides */}}
+  {{/* Create combined env list with overrides for reader */}}
   {{- $allNames := dict }}
-  {{- $applicationEnv := list }}
+  {{- $readerApplicationEnv := list }}
   
   {{/* First add app-specific env (highest priority) */}}
   {{- range $envMap := $appEnv }}
-    {{- $applicationEnv = append $applicationEnv $envMap }}
+    {{- $readerApplicationEnv = append $readerApplicationEnv $envMap }}
     {{- $_ := set $allNames $envMap.name true }}
   {{- end }}
   
   {{/* Then add template env if not already added */}}
   {{- range $envMap := $templateEnv }}
     {{- if not (hasKey $allNames $envMap.name) }}
-      {{- $applicationEnv = append $applicationEnv $envMap }}
+      {{- $readerApplicationEnv = append $readerApplicationEnv $envMap }}
       {{- $_ := set $allNames $envMap.name true }}
     {{- end }}
   {{- end }}
   
-  {{/* Finally add required env if not already added */}}
-  {{- range $envMap := $requiredEnv }}
+  {{/* Finally add required reader env if not already added */}}
+  {{- range $envMap := $readerEnv }}
     {{- if not (hasKey $allNames $envMap.name) }}
-      {{- $applicationEnv = append $applicationEnv $envMap }}
+      {{- $readerApplicationEnv = append $readerApplicationEnv $envMap }}
       {{- $_ := set $allNames $envMap.name true }}
     {{- end }}
   {{- end }}
+
+  {{/* Create combined env list with overrides for manager */}}
+  {{- $allNamesManager := dict }}
+  {{- $managerApplicationEnv := list }}
+  
+  {{/* First add app-specific env (highest priority) */}}
+  {{- range $envMap := $appEnv }}
+    {{- $managerApplicationEnv = append $managerApplicationEnv $envMap }}
+    {{- $_ := set $allNamesManager $envMap.name true }}
+  {{- end }}
+  
+  {{/* Then add template env if not already added */}}
+  {{- range $envMap := $templateEnv }}
+    {{- if not (hasKey $allNamesManager $envMap.name) }}
+      {{- $managerApplicationEnv = append $managerApplicationEnv $envMap }}
+      {{- $_ := set $allNamesManager $envMap.name true }}
+    {{- end }}
+  {{- end }}
+  
+  {{/* Finally add required manager env if not already added */}}
+  {{- range $envMap := $managerEnv }}
+    {{- if not (hasKey $allNamesManager $envMap.name) }}
+      {{- $managerApplicationEnv = append $managerApplicationEnv $envMap }}
+      {{- $_ := set $allNamesManager $envMap.name true }}
+    {{- end }}
+  {{- end }}
+
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}
+  name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}-reader
   labels:
     app.kubernetes.io/component: application-{{ $appName }}
     {{- include "inference-stack.labels" $ | nindent 4 }}
@@ -80,12 +114,40 @@ data:
         internal_port: 3005
       readers_config:
         {{ $appName }}:
+          {{- $finalReadersConfig := $mergedValues.readerConfig }}          
+          {{- range $key, $value := $finalReadersConfig }}
+          {{ snakecase $key }}: {{ $value }}
+          {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}-manager
+  labels:
+    app.kubernetes.io/component: application-{{ $appName }}
+    {{- include "inference-stack.labels" $ | nindent 4 }}
+data:
+  config.yaml: |
+    takeoff:
+      server_config:
+        internal_port: 3005
+      readers_config:
+        {{ $appName }}-manager:
           {{- $readerConfigTemplate := printf `
           internalGatewayIp: %s-gateway
           ` (include "inference-stack.fullname" $) }}
           {{- $templateReaderConfig := fromYaml $readerConfigTemplate }}
-          {{- $finalReadersConfig := merge $mergedValues.readerConfig $templateReaderConfig }}
-          {{- range $key, $value := $finalReadersConfig }}
+          {{- $managerOverrides := dict }}
+          {{- if $mergedValues.managerConfig.enabled }}
+          {{- if hasKey $mergedValues.managerConfig "skipSglangReader" }}
+          {{- $_ := set $managerOverrides "skipSglangReader" $mergedValues.managerConfig.skipSglangReader }}
+          {{- end }}
+          {{- if hasKey $mergedValues.managerConfig "sglangPort" }}
+          {{- $_ := set $managerOverrides "sglangPort" $mergedValues.managerConfig.sglangPort }}
+          {{- end }}
+          {{- end }}
+          {{- $finalManagerConfig := merge $mergedValues.readerConfig $templateReaderConfig $managerOverrides }}
+          {{- range $key, $value := $finalManagerConfig }}
           {{ snakecase $key }}: {{ $value }}
           {{- end }}
 ---
@@ -134,7 +196,7 @@ spec:
           - mountPath: /models
             name: {{ $mergedValues.modelsVolume.name }}
       containers:
-        - name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}
+        - name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}-reader
           {{- with $mergedValues.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
@@ -142,7 +204,7 @@ spec:
           image: "{{ $mergedValues.image.repository }}:{{ $mergedValues.image.tag | default (print $.Chart.AppVersion "-gpu") }}"
           imagePullPolicy: {{ $mergedValues.image.pullPolicy }}
           env:
-            {{ $applicationEnv | toYaml | nindent 12 }}
+            {{ $readerApplicationEnv | toYaml | nindent 12 }}
           {{- with $mergedValues.ports }}
           ports:
             {{- toYaml . | nindent 12 }}
@@ -160,7 +222,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: config
+            - name: reader-config
               mountPath: /code/config.yaml
               subPath: config.yaml
             - name: dshm
@@ -170,10 +232,52 @@ spec:
           {{- with $mergedValues.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+        
+        {{- if $mergedValues.managerConfig.enabled }}
+        - name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}-manager
+          {{- with $mergedValues.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ $mergedValues.image.repository }}:{{ $mergedValues.image.tag | default (print $.Chart.AppVersion "-gpu") }}"
+          imagePullPolicy: {{ $mergedValues.image.pullPolicy }}
+          env:
+            {{ $managerApplicationEnv | toYaml | nindent 12 }}
+          {{- with $mergedValues.ports }}
+          ports:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $mergedValues.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $mergedValues.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $mergedValues.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: manager-config
+              mountPath: /code/config.yaml
+              subPath: config.yaml
+            - name: dshm
+              mountPath: /dev/shm
+            - name: {{ $mergedValues.modelsVolume.name }}
+              mountPath: /code/models
+          {{- with $mergedValues.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
       volumes:
-        - name: config
+        - name: reader-config
           configMap:
-            name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}
+            name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}-reader
+        - name: manager-config
+          configMap:
+            name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}-manager
         - name: dshm
           emptyDir:
             medium: Memory

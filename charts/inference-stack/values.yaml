@@ -173,7 +173,7 @@ applicationTemplate:
   image:
     repository: tytn/takeoff-pro
     # This sets the pull policy for images.
-    pullPolicy: IfNotPresent
+    pullPolicy: Always # IfNotPresent <- Changed while developing
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
   # The config of the reader that will be deployed in this application.
@@ -204,6 +204,14 @@ applicationTemplate:
     # readerLogAsJson: Option<String>, # Whether to output json formatted logs
     # loras: Option<String>, # The loras to load on this reader.
     # enableDocumentProcessing: Option<bool>, # Whether to configure this reader for document processing.
+
+  # Configuration for the manager container
+  managerConfig:
+    enabled: true
+    sglangPort: 3003
+    skipSglangReader: true
+    # Additional reader config overrides for the manager container can be specified here
+    # These will be merged with the main readerConfig
 
   # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
   replicaCount: 1

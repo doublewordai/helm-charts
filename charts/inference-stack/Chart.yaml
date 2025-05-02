@@ -23,4 +23,4 @@ version: 1.1.0
 # The gateway will append this version with "-cpu", and the applications will append this version with "-gpu".
 # If you wish to override this behaviour, or deploy different versions of the gateway and apps,
 # you can do so by setting the gateway.image.tag and applications.image.tag respectively.
-appVersion: "0.22.0-rc23"
+appVersion: "thirdparty"

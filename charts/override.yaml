@@ -1,0 +1,19 @@
+# Add imagePullSecrets at the top level to be used by all pods
+imagePullSecrets:
+  - name: takeoff-regcred
+
+applications:
+  llama-1b: # must be url-safe! i.e. no underscores, or capitals.
+    readerConfig:
+      modelName: "unsloth/Llama-3.2-1B-Instruct"
+      device: "cuda"
+      consumerGroup: "primary"
+    resources:
+      limits:
+        cpu: 500m
+        memory: 5Gi # Make sure to provide enough to contain your model
+        nvidia.com/gpu: 1
+      requests:
+        cpu: 500m
+        memory: 5Gi
+        nvidia.com/gpu: 1
