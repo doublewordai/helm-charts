@@ -11,7 +11,7 @@ helm install rag doublewordai/rag
 
 ### Pulling Console images
 
-To access the Console images you need to make sure you are authenticated to pull from the TitanML DockerHub. To do this encode your docker auth into a k8s Secret. You can then make this accessible to k8s in your values.yaml file, so it can pull the container images:
+To access the Console images you need to make sure you are authenticated to pull from the Doubleword DockerHub. To do this encode your docker auth into a k8s Secret. You can then make this accessible to k8s in your values.yaml file, so it can pull the container images:
 
 ```yaml
 imagePullSecrets:
