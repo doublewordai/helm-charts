@@ -26,15 +26,26 @@
 
   {{/* Set the required env vars needed for the reader container */}}
   {{- $readerEnv := list }}
-  {{- $readerEnv = append $readerEnv (dict "name" "TAKEOFF_ADD_READER_ID_SUFFIX" "value" "true") }}
-  {{- $readerEnv = append $readerEnv (dict "name" "TAKEOFF_HEADLESS" "value" "false") }}
+  {{- if eq $mergedValues.readerType "takeoff" }}
+    {{- $readerEnv = append $readerEnv (dict "name" "TAKEOFF_ADD_READER_ID_SUFFIX" "value" "true") }}
+    {{- $readerEnv = append $readerEnv (dict "name" "TAKEOFF_HEADLESS" "value" "false") }}
+  {{- end }}
   {{- $readerEnv = append $readerEnv (dict "name" "POD_NAME" "valueFrom" (dict "fieldRef" (dict "fieldPath" "metadata.name"))) }}
+  
+  {{/* Add reader-type specific env vars */}}
+  {{- if eq $mergedValues.readerType "sglang" }}
+    {{- if $mergedValues.readerConfig.accessToken }}
+    {{- $readerEnv = append $readerEnv (dict "name" "HF_TOKEN" "value" $mergedValues.readerConfig.accessToken) }}
+    {{- end }}
+  {{- end }}
 
   {{/* Set the required env vars needed for the manager container */}}
   {{- $managerEnv := list }}
   {{- $managerEnv = append $managerEnv (dict "name" "TAKEOFF_ADD_READER_ID_SUFFIX" "value" "true") }}
   {{- $managerEnv = append $managerEnv (dict "name" "TAKEOFF_HEADLESS" "value" "true") }}
+  {{- if eq $mergedValues.readerType "sglang" }}
   {{- $managerEnv = append $managerEnv (dict "name" "TAKEOFF_READER_ENGINE" "value" "sglang") }}
+  {{- end }}
   {{- $managerEnv = append $managerEnv (dict "name" "POD_NAME" "valueFrom" (dict "fieldRef" (dict "fieldPath" "metadata.name"))) }}
 
   {{/* Process template env */}}
@@ -201,8 +212,37 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ $mergedValues.image.repository }}:{{ $mergedValues.image.tag | default (print $.Chart.AppVersion "-gpu") }}"
+          {{- if eq $mergedValues.readerType "sglang" }}
+          {{- /* Use reader-specific image if readerType is not takeoff */}}
+          image: "{{ $mergedValues.image.sglang.repository }}:{{ $mergedValues.image.sglang.tag | default "latest" }}"
           imagePullPolicy: {{ $mergedValues.image.pullPolicy }}
+          command: ["python3"]
+          args:
+            - "-m"
+            - "sglang.launch_server"
+            - "--model-path"
+            - "{{ $mergedValues.readerConfig.modelName }}"
+            - "--host"
+            - "0.0.0.0"
+            - "--port" 
+            - "3003"
+            - "--device"
+            - "{{ $mergedValues.readerConfig.device }}"
+            {{- if $mergedValues.readerConfig.tensorParallel }}
+            - "--tp" 
+            - "{{ $mergedValues.readerConfig.tensorParallel }}"
+            {{- end }}
+          {{- else if eq $mergedValues.readerType "takeoff" }}
+          {{- /* Use reader-specific image if readerType is takeoff */}}`
+          {{- /* Use default takeoff image */}}
+          image: "{{ $mergedValues.image.takeoff.repository }}:{{ $mergedValues.image.takeoff.tag | default (print $.Chart.AppVersion "-gpu") }}"
+          imagePullPolicy: {{ $mergedValues.image.pullPolicy }}
+          {{/* default with takoeff if incorrect reader type*/}}
+          {{- else }}
+          {{- /* Use default takeoff image */}}
+          image: "{{ $mergedValues.image.takeoff.repository }}:{{ $mergedValues.image.takeoff.tag | default (print $.Chart.AppVersion "-gpu") }}"
+          imagePullPolicy: {{ $mergedValues.image.pullPolicy }}
+          {{- end }}
           env:
             {{ $readerApplicationEnv | toYaml | nindent 12 }}
           {{- with $mergedValues.ports }}
@@ -222,13 +262,20 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
+            {{/* we dont need to mount the reader config for sglang, the config is specified in the python run command*/}}
+            {{- if eq $mergedValues.readerType "takeoff" }}
             - name: reader-config
               mountPath: /code/config.yaml
               subPath: config.yaml
+            {{- end }}
             - name: dshm
               mountPath: /dev/shm
             - name: {{ $mergedValues.modelsVolume.name }}
+              {{- if eq $mergedValues.readerType "sglang" }}
+              mountPath: /root/.cache/huggingface
+              {{- else }}
               mountPath: /code/models
+              {{- end }}
           {{- with $mergedValues.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -239,7 +286,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ $mergedValues.image.repository }}:{{ $mergedValues.image.tag | default (print $.Chart.AppVersion "-gpu") }}"
+          image: "{{ $mergedValues.image.takeoff.repository }}:{{ $mergedValues.image.takeoff.tag | default (print $.Chart.AppVersion "-cpu") }}"
           imagePullPolicy: {{ $mergedValues.image.pullPolicy }}
           env:
             {{ $managerApplicationEnv | toYaml | nindent 12 }}

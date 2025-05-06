@@ -4,10 +4,12 @@ imagePullSecrets:
 
 applications:
   llama-1b: # must be url-safe! i.e. no underscores, or capitals.
+    readerType: "sglang"
     readerConfig:
       modelName: "unsloth/Llama-3.2-1B-Instruct"
       device: "cuda"
       consumerGroup: "primary"
+      tensorParallel: 1
     resources:
       limits:
         cpu: 500m
