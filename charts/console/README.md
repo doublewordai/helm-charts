@@ -53,7 +53,7 @@ In the Azure Portal, configure the Directory.   Choose 'Manage', 'App registrati
 | Redirect URI Platform   | Web                                                        |
 | Redirect URI            | https://doubleword.yourdomain.example/authentication/auth  |
                           
-The Redirect URI does not have to be publically accessible.
+The Redirect URI does not have to be accessible to the Internet.
 
 #### Create a client secret
 
