@@ -1,3 +1,4 @@
+{{- if eq .Values.cluster.role "leader" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -79,57 +80,6 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ include "console.fullname" . }}-reconciler
-  labels:
-    {{- include "console.labels" . | nindent 4 }}
-    app.kubernetes.io/component: reconciler
-spec:
-  replicas: {{ .Values.cluster.reconciler.replicaCount }}
-  selector:
-    matchLabels:
-      {{- include "console.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: reconciler
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: reconciler
-        {{- include "console.labels" . | nindent 8 }}
-    spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "console.serviceAccountName" . }}
-      containers:
-        - name: {{ .Chart.Name }}-reconciler
-          image: "{{ .Values.cluster.reconciler.image.repository }}:{{ .Values.cluster.reconciler.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.cluster.reconciler.image.pullPolicy }}
-          {{- with .Values.cluster.reconciler.ports }}
-          ports:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          env:
-            {{- include "console.zeusReconcilerEnv" . | nindent 12 }}
-          {{- with .Values.cluster.reconciler.livenessProbe }}
-          livenessProbe:
-            httpGet:
-              path: {{ .httpGet.path | quote }}
-              port: {{ .httpGet.port }}
-          {{- end }}
-          {{- with .Values.cluster.reconciler.readinessProbe }}
-          readinessProbe:
-            httpGet:
-              path: {{ .httpGet.path | quote }}
-              port: {{ .httpGet.port }}
-          {{- end }}
-          {{- with .Values.cluster.reconciler.resources }}
-          resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -487,3 +437,55 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 {{- end}}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "console.fullname" . }}-reconciler
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+    app.kubernetes.io/component: reconciler
+spec:
+  replicas: {{ .Values.cluster.reconciler.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "console.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: reconciler
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: reconciler
+        {{- include "console.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "console.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}-reconciler
+          image: "{{ .Values.cluster.reconciler.image.repository }}:{{ .Values.cluster.reconciler.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.cluster.reconciler.image.pullPolicy }}
+          {{- with .Values.cluster.reconciler.ports }}
+          ports:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- include "console.zeusReconcilerEnv" . | nindent 12 }}
+          {{- with .Values.cluster.reconciler.livenessProbe }}
+          livenessProbe:
+            httpGet:
+              path: {{ .httpGet.path | quote }}
+              port: {{ .httpGet.port }}
+          {{- end }}
+          {{- with .Values.cluster.reconciler.readinessProbe }}
+          readinessProbe:
+            httpGet:
+              path: {{ .httpGet.path | quote }}
+              port: {{ .httpGet.port }}
+          {{- end }}
+          {{- with .Values.cluster.reconciler.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

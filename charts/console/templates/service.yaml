@@ -1,3 +1,4 @@
+{{- if eq .Values.cluster.role "leader" }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -100,4 +101,5 @@ spec:
   selector:
     app.kubernetes.io/component: debug
     {{- include "console.selectorLabels" . | nindent 4 }}
+{{- end }}
 {{- end }}
