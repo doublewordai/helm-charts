@@ -1,0 +1,188 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "inference-stack.fullname" $ }}-gateway
+  labels:
+    app.kubernetes.io/component: gateway
+    {{- include "inference-stack.labels" $ | nindent 4 }}
+data:
+  config.yaml: |
+    takeoff:
+      server_config:
+        {{- range $key, $value := .Values.gateway.config }}
+        {{ snakecase $key }}: {{$value}}
+        {{- end }}
+        {{- if not (hasKey .Values.gateway.config "internalPort") }}
+        internal_port: 3005
+        {{- end }}
+      readers_config:
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "inference-stack.fullname" . }}-gateway
+  labels:
+    app.kubernetes.io/component: gateway
+    {{- include "inference-stack.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.gateway.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: gateway
+      {{- include "inference-stack.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.gateway.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/component: gateway
+        {{- include "inference-stack.labels" . | nindent 8 }}
+        {{- with .Values.gateway.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "inference-stack.serviceAccountName" . }}
+      {{- with .Values.gateway.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "inference-stack.fullname" . }}-gateway
+          {{- with .Values.gateway.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag | default (print $.Chart.AppVersion "-cpu") }}"
+          imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
+          env:
+            {{- include "inference-stack.gatewayEnv" . | nindent 12 }}
+          {{- with .Values.gateway.ports }}
+          ports:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gateway.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gateway.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gateway.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /code/config.yaml
+              subPath: config.yaml
+          {{- with .Values.gateway.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "inference-stack.fullname" $ }}-gateway
+      {{- with .Values.gateway.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.gateway.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.gateway.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.gateway.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "inference-stack.fullname" . }}-gateway
+  labels:
+    app.kubernetes.io/component: gateway
+    {{- include "inference-stack.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.gateway.service.type }}
+  {{- with .Values.gateway.service.ports }}
+  ports:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    app.kubernetes.io/component: gateway
+    {{- include "inference-stack.selectorLabels" . | nindent 4 }}
+---
+{{- if .Values.gateway.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "inference-stack.fullname" . }}-gateway
+  labels:
+    app.kubernetes.io/component: gateway
+    {{- include "inference-stack.labels" . | nindent 4 }}
+  {{- with .Values.gateway.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.gateway.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- if .Values.gateway.ingress.tls }}
+  tls:
+    {{- range .Values.gateway.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.gateway.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            {{- with .pathType }}
+            pathType: {{ . }}
+            {{- end }}
+            backend:
+              service:
+                name: {{ include "inference-stack.fullname" $ }}-gateway
+                port:
+                  number: http
+          {{- end }}
+    {{- end }}
+{{- end }}
+---
+{{- if .Values.gateway.exportPrometheusMetrics }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "inference-stack.fullname" $ }}-gateway
+  labels:
+    app.kubernetes.io/component: gateway
+    {{- include "inference-stack.labels" $ | nindent 4 }}
+spec:
+  endpoints:
+  - interval: 15s
+    targetPort: 3001
+    path: /metrics
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: gateway
+---
+{{- end }}

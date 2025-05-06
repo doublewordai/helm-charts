@@ -1,0 +1,3 @@
+- op: replace
+  path: /spec/customresourcedefinitions/owned/0/version
+  value: v1alpha1

@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "rag.fullname" $ }}-postgres
+  labels:
+    app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
+    {{- include "rag.labels" $ | nindent 4 }}
+spec:
+  serviceName: {{ include "rag.fullname" $ }}-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "rag.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
+  template:
+    metadata:
+      labels:
+        {{- include "rag.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
+    spec:
+      containers:
+      - name: postgres
+        image: pgvector/pgvector:pg16
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: POSTGRES_DB
+          value: {{ include "rag.internalDbName" $ }}
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secret.name }}
+              key: INTERNAL_DATABASE_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secret.name }}
+              key: INTERNAL_DATABASE_PASSWORD
+        - name: PGDATA
+          value: /data/pgdata
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /data
+      {{- if .Values.dbExistingPvcName }}
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.dbExistingPvcName }}
+      {{- end }}
+  {{- if not .Values.dbExistingPvcName }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ include "rag.fullname" $ }}-postgres
+      labels:
+        {{- include "rag.labels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+  {{- end }}

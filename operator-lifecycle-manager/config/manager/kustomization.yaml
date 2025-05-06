@@ -1,0 +1,13 @@
+resources:
+- bases/manager.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: controller
+  newName: tytn/operator
+  newTag: 2.2.4
+
+patches:
+- path: deploymentPatch.yaml
+  target:
+    kind: Deployment

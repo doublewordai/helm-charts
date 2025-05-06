@@ -1,0 +1,45 @@
+{{- if .Values.rbac.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "console.fullname" . }}-role
+rules:
+- apiGroups: ["doublewordai.co"]
+  resources: ["inferencestacks"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Namespace }}-{{ include "console.fullname" . }}-cluster-role
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "console.fullname" . }}-role-binding
+subjects:
+- kind: ServiceAccount
+  name: {{ include "console.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: {{ include "console.fullname" . }}-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Namespace }}-{{ include "console.fullname" . }}-cluster-role-binding
+subjects:
+- kind: ServiceAccount
+  name: {{ include "console.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ .Release.Namespace }}-{{ include "console.fullname" . }}-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

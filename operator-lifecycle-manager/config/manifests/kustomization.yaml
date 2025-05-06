@@ -1,0 +1,46 @@
+# These resources constitute the fully configured set of manifests
+# used to generate the 'manifests/' directory in a bundle.
+resources:
+- bases/inference-stack-operator.clusterserviceversion.yaml
+- ../rbac
+- ../manager
+- metrics_service.yaml
+
+# Adds namespace to all resources.
+namespace: inference-stack-operator-system
+
+# Value of this field is prepended to the
+# names of all resources, e.g. a deployment named
+# "wordpress" becomes "alices-wordpress".
+# Note that it should also match with the prefix (text before '-') of the namespace
+# field above.
+nameSuffix: -2-2-4
+
+# Labels to add to all resources and selectors.
+#labels:
+#- includeSelectors: true
+#  pairs:
+#    someName: someValue
+
+# [PROMETHEUS] To enable prometheus monitor, uncomment all sections with 'PROMETHEUS'.
+#- ../prometheus
+# [METRICS] Expose the controller manager metrics service.
+# [NETWORK POLICY] Protect the /metrics endpoint and Webhook Server with NetworkPolicy.
+# Only Pod(s) running a namespace labeled with 'metrics: enabled' will be able to gather the metrics.
+# Only CR(s) which requires webhooks and are applied on namespaces labeled with 'webhooks: enabled' will
+# be able to communicate with the Webhook Server.
+#- ../network-policy
+
+# Uncomment the patches line if you enable Metrics, and/or are using webhooks and cert-manager
+# [METRICS] The following patch will enable the metrics endpoint using HTTPS and the port :8443.
+# More info: https://book.kubebuilder.io/reference/metrics
+patches:
+- path: manager_metrics_patch.yaml
+  target:
+    kind: Deployment
+- path: clusterServiceVersionPatch.yaml
+  target:
+    kind: ClusterServiceVersion
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization

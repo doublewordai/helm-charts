@@ -1,0 +1,160 @@
+suite: test value merging
+release:
+  name: "test-release"
+  namespace: "test-namespace"
+templates:
+  - templates/applications.yaml
+tests:
+  - it: should configure ScaledObject correctly with custom parameters
+    set:
+      applications:
+        custom-scaled-app:
+          scaling:
+            enabled: true
+            spec:
+              minReplicaCount: 2
+              maxReplicaCount: 10
+              cooldownPeriod: 600
+            metricTarget:
+              value: 25
+    documentSelector:
+      path: $[?(@.kind=="ScaledObject")].metadata.labels['app.kubernetes.io/component']
+      value: application-custom-scaled-app
+    asserts:
+      - equal:
+          path: spec.minReplicaCount
+          value: 2
+      - equal:
+          path: spec.maxReplicaCount
+          value: 10
+      - equal:
+          path: spec.cooldownPeriod
+          value: 600
+      - equal:
+          path: spec.triggers[0].metadata.scalerAddress
+          value: test-release-inference-stack-gateway.test-namespace.svc.cluster.local:3005
+      - equal:
+          path: spec.triggers[0].metadata.target_primary
+          value: "25"
+
+  - it: should correctly override default environment variables
+    set:
+      applicationTemplate:
+        env:
+          - name: DEFAULT_VAR
+            value: "default-value"
+          - name: OVERRIDE_VAR
+            value: "template-value"
+      applications:
+        env-app:
+          env:
+            - name: OVERRIDE_VAR
+              value: "app-specific-value"
+            - name: APP_VAR
+              value: "app-only-value"
+    documentSelector:
+      path: $[?(@.kind=="Deployment")].metadata.labels['app.kubernetes.io/component']
+      value: application-env-app
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DEFAULT_VAR
+            value: "default-value"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OVERRIDE_VAR
+            value: "app-specific-value"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: APP_VAR
+            value: "app-only-value"
+
+  - it: should append custom volume mounts to default ones
+    set:
+      applications:
+        volume-app:
+          volumeMounts:
+            - name: custom-volume
+              mountPath: /custom/path
+          volumes:
+            - name: custom-volume
+              emptyDir: {}
+    documentSelector:
+      path: $[?(@.kind=="Deployment")].metadata.labels['app.kubernetes.io/component']
+      value: application-volume-app
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: config
+            mountPath: /code/config.yaml
+            subPath: config.yaml
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: custom-volume
+            mountPath: /custom/path
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: custom-volume
+            emptyDir: {}
+  - it: should completely replace modelsVolume when specified in application
+    set:
+      applicationTemplate:
+        modelsVolume:
+          name: models-template
+          emptyDir:
+            medium: Memory
+      applications:
+        models-app:
+          modelsVolume:
+            name: models-custom
+            hostPath:
+              path: /custom/models/path
+              type: DirectoryOrCreate
+    documentSelector:
+      path: $[?(@.kind=="Deployment")].metadata.labels['app.kubernetes.io/component']
+      value: application-models-app
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[?(@.name=="models-custom")].hostPath.path
+          value: /custom/models/path
+      - equal:
+          path: spec.template.spec.volumes[?(@.name=="models-custom")].hostPath.type
+          value: DirectoryOrCreate
+      - notExists:
+          path: spec.template.spec.volumes[?(@.name=="models-template")]
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.mountPath=="/code/models")].name
+          value: models-custom
+
+  - it: should ensure no mixed volume types when replacing modelsVolume
+    set:
+      applicationTemplate:
+        modelsVolume:
+          name: models-template
+          emptyDir:
+            medium: Memory
+      applications:
+        mixed-volume-app:
+          modelsVolume:
+            name: models-custom
+            hostPath:
+              path: /custom/models/path
+              type: DirectoryOrCreate
+    documentSelector:
+      path: $[?(@.kind=="Deployment")].metadata.labels['app.kubernetes.io/component']
+      value: application-mixed-volume-app
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[?(@.name=="models-custom")].hostPath.path
+          value: /custom/models/path
+      - notExists:
+          path: spec.template.spec.volumes[?(@.name=="models-custom")].emptyDir
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].name
+          value: models-custom

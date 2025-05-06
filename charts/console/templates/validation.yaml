@@ -1,0 +1,4 @@
+{{- $releaseNameLength := len .Release.Name -}}
+{{- if gt $releaseNameLength 48 -}}
+{{- fail (printf "Release name '%s' is %d characters long, which exceeds the maximum allowed length of 48 characters. Please choose a shorter release name." .Release.Name $releaseNameLength) -}}
+{{- end -}}

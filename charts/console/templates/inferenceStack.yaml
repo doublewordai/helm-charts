@@ -1,0 +1,19 @@
+apiVersion: doublewordai.co/{{ .Values.inferenceStack.crdVersion }}
+kind: InferenceStack
+metadata:
+  name: {{ include "console.inferenceStackCRName" $ }}
+  labels:
+    operatorVersion: {{ .Values.inferenceStack.operatorVersion }}
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  fullnameOverride: {{ include "console.inferenceStackCRName" $ }}
+  nameOverride: ""
+  # Empty applications object which is populated later
+  applications: {}
+  gateway:
+    exportPrometheusMetrics: {{ .Values.inferenceStack.exportPrometheusMetrics }}
+  # If we have imagePullSecrets, add them to the CR
+  {{- with .Values.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

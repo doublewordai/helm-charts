@@ -1,0 +1,201 @@
+# Default values for catalog.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+# If a job should be spawned to export feedback data from internal db to remote db
+exportFeedback: false
+dbExistingPvcName: null
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: tytn/helios
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+ports:
+  - name: api
+    containerPort: 8000
+    protocol: TCP
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: 80
+  annotations: 
+
+# Extra services to be deployed alongside the main deployment, for instance application load balancers
+additionalServices: []
+  # - name: takeoff-server-lb
+  #   annotations:
+  #     service.beta.kubernetes.io/aws-load-balancer-type: "external"
+  #     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+  #     helm.sh/resource-policy: keep
+  #   spec:
+  #     type: LoadBalancer
+  #     ports:
+  #       - port: 8000
+  #         targetPort: 8000
+  #         protocol: TCP
+  #         name: api
+  #     selector:
+  #       app.kubernetes.io/component: rag
+
+resources:
+  limits:
+    cpu: 2
+    memory: 8Gi
+  requests:
+    cpu: 2
+    memory: 8Gi
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe:
+  exec:
+    command:
+    - sh
+    - -c
+    - "curl -f -u $APP_USERNAME:$APP_PASSWORD http://localhost:8000/api/v1/healthz"
+  initialDelaySeconds: 120
+  periodSeconds: 5
+  timeoutSeconds: 10
+  failureThreshold: 10
+readinessProbe:
+  exec:
+    command:
+    - sh
+    - -c
+    - "curl -f -u $APP_USERNAME:$APP_PASSWORD http://localhost:8000/api/v1/healthz"
+
+# This is if the server should store a persistent volume for its data
+dataCache:
+  enabled: false
+  persistentVolumeClaim: rag-server-data
+
+serviceMonitor:
+  enabled: false
+
+configMaps:
+  server-config:
+    data:
+      config_server.json: |
+        {
+          "reader": "TitanLayout",
+          "chunker": "TokenChunker",
+          "retriever": {
+            "window": true,
+            "rerank": false
+          },
+          "generator": "TakeoffGenerator",
+          "categories": [
+            "category-1",
+            "category-2",
+            "category-3",
+            "category-4"
+          ]
+        }
+  prompt-config:
+    data:
+      prompt_config.json: |
+        {
+          "rag": {
+              "system_prompt": "You are a helpful, respectful and honest assistant. Your internal knowledge base was last updated in {December 2023}. If asked about events or news that may have happened after this cutoff date, never claim or imply they are unverified or rumors or that they only allegedly happened or that they are inaccurate, since you cannot know either way and lets the human users know this. Answer user queries using only the provided context. Do not explain who you are or preamble, get straight to answering the question. If the context does not provide enough information, say so. Try to be helpful, knowledgeable, polite, playful, and less formal, yet remains professional. If asked about controversial topics, try to provide careful thoughts and clear information while remaining neutral and objective. Focus on verified facts or widely accepted perspectives. When asked about a very obscure person, object, or topic—where information is rare or unlikely to appear more than once or twice online—end your response by reminding the user that, while you strive for accuracy, you might provide incorrect or hallucinate. Use the term \"hallucinate\" as this is a term the user is likely to understand. Use Markdown for presenting code, structured data, or images in a clear and organized format.",
+              "user_template": "CONTEXT:\n{user_context}\n---------------------\nGiven the context information and not prior knowledge, answer the query - do not explain you are using the context just go into answering the question. The conversation history will also be provided so the users can ask follow-up questions to your responses. Try and be a succinct as possible unless asked to elaborate.\nQUERY:\n{query}\nANSWER:"
+          },
+          "general": {
+              "system_prompt": "You are a helpful, respectful and honest assistant. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information. You can use information in the conversation history to help answer questions.",
+              "user_template": "{query}"
+          },
+          "fusion": {
+              "system_prompt": "You are a helpful assistant that generates multiple search queries based on a single input query. The alternative queries should have the same semantic meaning as the original query, but have different phrasing and terminology. Generate 5 search queries related to the original query.",
+              "user_template": "Original Query: {query}\n"
+          },
+          "table_summary": {
+              "system_prompt": "You will be given a table, your job is to summarize the table and its contents. Your summary will be used to embed a representation of the table for downstream lookups that need to match user queries to the table if the table is relevant to their query. Try and give as much detail as possible. Base the summary on the types of question users may ask, and include table values if you think it is relevant text. Do not explain your reasoning or how you arrived at the summary - just return the summary.",
+              "user_template": "{query}"
+          }
+        }
+
+# Additional volumes on the output Deployment definition.
+volumes:
+- name: helios-cache
+  emptyDir: {}
+- name: server-config
+  configMap:
+    name: server-config
+- name: prompt-config
+  configMap:
+    name: prompt-config
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts:
+- name: helios-cache
+  mountPath: /TakeoffRag/.helios/
+- name: server-config
+  mountPath: /TakeoffRag/config_server.json
+  subPath: config_server.json
+  readOnly: false
+- name: prompt-config
+  mountPath: /TakeoffRag/helios/components/nlp/prompt_config.json
+  subPath: prompt_config.json
+  readOnly: false
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env: []
+
+secret:
+  name: rag-secret
+  # The keys in the secret in which each object is stored
+  keys:
+    appPassword: APP_PASSWORD
+    appUsername: APP_USERNAME
+    githubToken: GITHUB_TOKEN
+    mongoDbPassword: MONGODB_PASSWORD
+    mongoDbConnectionString: MONGODB_CONNECTION_STRING
+    internalDbPassword: INTERNAL_DATABASE_PASSWORD
+    internalDbUser: INTERNAL_DATABASE_USER

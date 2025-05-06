@@ -1,0 +1,14 @@
+{{- if .Values.enableMetrics }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: takeoff-dashboard
+  labels:
+    grafana_dashboard: "1"
+data:
+  takeoff-stack-dash.json: |-
+{{ .Files.Get "dashboards/takeoff-stack-dash.json" | indent 4 }}
+  takeoff-generate-dash.json: |-
+{{ .Files.Get "dashboards/takeoff-generate-dash.json" | indent 4 }}
+---
+{{- end }}

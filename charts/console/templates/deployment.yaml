@@ -1,0 +1,440 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "console.fullname" . }}-backend
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "console.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      {{- with .Values.backend.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/component: backend
+        {{- include "console.labels" . | nindent 8 }}
+        {{- with .Values.backend.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "console.serviceAccountName" . }}
+      {{- with .Values.backend.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.backend.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          env:
+            {{- include "console.zeusBackendEnv" . | nindent 12 }}
+          {{- with .Values.backend.ports }}
+          ports:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.backend.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.backend.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.backend.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.backend.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.backend.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "console.fullname" . }}-frontend
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: frontend
+      {{- include "console.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.frontend.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/component: frontend
+        {{- include "console.labels" . | nindent 8 }}
+        {{- with .Values.frontend.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "console.serviceAccountName" . }}
+      {{- with .Values.frontend.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.frontend.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+          {{- with .Values.frontend.ports }}
+          ports:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.frontend.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.frontend.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.frontend.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.frontend.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- include "console.zeusFrontendEnv" . | nindent 12 }}
+      {{- with .Values.frontend.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.frontend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.frontend.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.frontend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+{{- if .Values.authentication.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "console.fullname" $ }}-authentication
+  labels:
+    {{- include "console.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: authentication
+spec:
+  replicas: {{ .Values.authentication.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "console.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: authentication
+  template:
+    metadata:
+      {{- with .Values.authentication.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/component: authentication
+        {{- include "console.selectorLabels" $ | nindent 8 }}
+        {{- with .Values.authentication.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "console.serviceAccountName" $ }}
+      {{- with .Values.authentication.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.authentication.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.authentication.image.repository }}:{{ .Values.authentication.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.authentication.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9090
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+              scheme: HTTP
+          env:
+            - name: PUBLIC_ACCESS
+              value: "{{ .Values.authentication.sso.publicAccess }}"
+            - name: FQDN
+              value: "{{ .Values.authentication.sso.fqdn }}"
+            - name: PROVIDER
+              value: "{{ .Values.authentication.sso.provider }}"
+            - name: CLIENT_ID
+              value: "{{ .Values.authentication.sso.clientId }}"
+            - name: CLIENT_SECRET
+              value: "{{ .Values.authentication.sso.clientSecret }}"
+            - name: AUTH_URL
+              value: "{{ .Values.authentication.sso.authUrl }}"
+            - name: TOKEN_URL
+              value: "{{ .Values.authentication.sso.tokenUrl  }}"
+          {{- with .Values.authentication.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.authentication.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.authentication.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.authentication.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end}}
+---
+{{- if .Values.reverseproxy.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "console.fullname" $ }}-reverseproxy
+  labels:
+    {{- include "console.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: reverseproxy
+spec:
+  replicas: {{ .Values.reverseproxy.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "console.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: reverseproxy
+  template:
+    metadata:
+      {{- with .Values.reverseproxy.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/component: reverseproxy
+        {{- include "console.selectorLabels" $ | nindent 8 }}
+        {{- with .Values.reverseproxy.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "console.serviceAccountName" $ }}
+      {{- with .Values.reverseproxy.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.reverseproxy.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.reverseproxy.image.repository }}:{{ .Values.reverseproxy.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.reverseproxy.image.pullPolicy }}
+          ports:
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: https
+              scheme: HTTPS
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: https
+              scheme: HTTPS
+          env:
+            - name: AUTHENTICATION_SERVICE
+              value: {{ include "console.fullname" $ }}-authentication
+            - name: AUTHENTICATION_PORT
+              value: "{{ .Values.authentication.service.port }}"
+            {{- if .Values.debug.enabled }}
+            - name: DEBUG_SERVICE
+              value: {{ include "console.fullname" $ }}-debug
+            - name: DEBUG_PORT
+              value: "{{ .Values.debug.service.port }}"
+            {{- end}}
+            - name: FRONTEND_SERVICE
+              value: {{ include "console.fullname" $ }}-frontend
+            - name: FRONTEND_PORT
+              value: "{{ .Values.frontend.service.port }}"
+            - name: BACKEND_SERVICE
+              value: {{ include "console.fullname" $ }}-backend
+            - name: BACKEND_PORT
+              value: "{{ .Values.backend.service.port }}"
+            - name: GATEWAY_SERVICE
+              value: {{ include "console.inferenceStackCRName" $ }}-gateway
+            - name: GATEWAY_PORT
+              value: "80"
+            - name: TLS_CERTIFICATE_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.reverseproxy.secretName }}
+                  key: {{ .Values.reverseproxy.keys.certificate }}
+            - name: TLS_PRIVATE_KEY_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.reverseproxy.secretName }}
+                  key: {{ .Values.reverseproxy.keys.privateKey }}
+          {{- with .Values.reverseproxy.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.reverseproxy.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.reverseproxy.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.reverseproxy.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end}}
+---
+{{- if .Values.debug.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "console.fullname" $ }}-debug
+  labels:
+    {{- include "console.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: debug
+spec:
+  replicas: {{ .Values.debug.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "console.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: debug
+  template:
+    metadata:
+      {{- with .Values.debug.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/component: debug
+        {{- include "console.selectorLabels" $ | nindent 8 }}
+        {{- with .Values.debug.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "console.serviceAccountName" $ }}
+      {{- with .Values.debug.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.debug.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.debug.image.repository }}:{{ .Values.debug.image.tag }}"
+          imagePullPolicy: {{ .Values.debug.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          env:
+          {{- with .Values.debug.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.debug.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.debug.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.debug.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end}}

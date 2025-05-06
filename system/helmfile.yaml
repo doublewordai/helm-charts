@@ -1,0 +1,62 @@
+environments: 
+  default: 
+    values: 
+      - values.yaml
+---
+repositories:
+- name: keda
+  url: "https://kedacore.github.io/charts"
+- name: doublewordai
+  url: "https://doublewordai.github.io/helm-charts"
+- name: argo-cd
+  url: "https://argoproj.github.io/argo-helm"
+- name: nvidia
+  url: "https://helm.ngc.nvidia.com/nvidia"
+
+releases:
+- name: keda
+  chart: keda/keda
+  version: 2.15.1
+  namespace: keda
+
+- name: monitoring
+  chart: doublewordai/monitoring
+  version: 1.0.0
+  namespace: monitoring
+  set:
+  - name: kube-prometheus-stack.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.metadata.namespace
+    value: monitoring
+  - name: kube-prometheus-stack.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName
+    value: {{ requiredEnv "PROMETHEUS_STORAGE_CLASS" }}
+
+- name: catalog
+  chart: doublewordai/catalog
+  installed: {{ .Values.catalog.enabled }}
+  version: 1.0.0
+  namespace: inference-stack-operator-system
+
+- name: argo-cd
+  chart: argo-cd/argo-cd
+  version: 7.0.0
+  installed: {{ .Values.argocd.enabled }}
+  namespace: argocd
+  set:
+  - name: namespaceOverride
+    value: argocd
+
+# https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/google-gke.html#using-nvidia-driver-manager
+- name: gpu-operator-dependencies
+  chart: ./charts/gpu-operator-dependencies/
+  installed: {{ .Values.gpuOperator.enabled }}
+  namespace: gpu-operator
+
+- name: gpu-operator
+  needs: 
+    - gpu-operator-dependencies
+  chart: nvidia/gpu-operator
+  installed: {{ .Values.gpuOperator.enabled }}
+  namespace: gpu-operator
+  version: "v24.9.2"
+  set:
+  - name: "toolkit.version"
+    value: {{ requiredEnv "NVIDIA_TOOLKIT_VERSION" }}

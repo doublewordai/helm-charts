@@ -1,0 +1,52 @@
+name: Inference Stack Helm Chart Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+jobs:
+  helm-unittest-inference-stack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: "latest"
+
+      - name: Install Helm unittest plugin
+        run: |
+          helm plugin install https://github.com/helm-unittest/helm-unittest
+
+      - name: Run Helm lint for inference-stack
+        working-directory: ./charts/inference-stack
+        run: |
+          helm lint .
+      
+      - name: Run Helm lint for catalog
+        working-directory: ./charts/catalog
+        run: |
+          helm lint .
+      
+      - name: Run Helm lint for monitoring
+        working-directory: ./charts/monitoring
+        run: |
+          helm lint .
+
+      - name: Run Helm lint for console
+        working-directory: ./charts/console
+        run: |
+          helm lint .
+
+      - name: Run Helm unittest for inference-stack
+        working-directory: ./charts/inference-stack
+        run: |
+          helm unittest .

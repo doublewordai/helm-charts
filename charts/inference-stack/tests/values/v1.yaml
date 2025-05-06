@@ -1,0 +1,32 @@
+gateway.exportPrometheusMetrics: true
+applications:
+  hello-world-1: {}
+  hello-world-2:
+    readerConfig:
+      modelName: "custom/model"
+      device: "cuda"
+      consumerGroup: "secondary"
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+        nvidia.com/gpu: 1
+  scaled-app:
+    scaling:
+      enabled: true
+      metricTarget:
+        value: 15
+    readerConfig:
+      consumerGroup: "scalable"
+  ingress-app:
+    ingress:
+      enabled: true
+      className: "nginx"
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt
+      hosts:
+        - host: model.example.com
+          paths:
+            - path: /
+              pathType: Prefix

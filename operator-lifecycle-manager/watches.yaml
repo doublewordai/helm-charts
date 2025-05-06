@@ -1,0 +1,10 @@
+# Use the 'create api' subcommand to add watches to this file.
+- group: doublewordai.co
+  version: v1alpha1
+  kind: InferenceStack
+  chart: helm-charts/inference-stack
+  selector:
+    matchLabels:
+      operatorVersion: v2
+
+# +kubebuilder:scaffold:watch

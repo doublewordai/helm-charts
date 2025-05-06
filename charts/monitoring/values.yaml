@@ -1,0 +1,45 @@
+kube-prometheus-stack:
+  prometheus:
+    serviceMonitor:
+      scrapeInterval: 15s
+
+    prometheusSpec:
+      retention: 1y
+
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+      scrapeConfigSelectorNilUsesHelmValues: false
+      ruleSelectorNilUsesHelmValues: false
+
+      storageSpec:
+        volumeClaimTemplate:
+          metadata:
+            name: prom
+          spec:
+            accessModes: [ "ReadWriteOnce" ]
+            resources:
+              requests:
+                storage: 100Gi
+
+  alertmanager:
+    # Example configuration for Alertmanager
+    enabled: trued
+
+  defaultRules:
+    create: false
+
+  grafana:
+    enabled: true
+
+    grafana.ini:
+      unified_alerting:
+        enabled: true
+
+      security:
+        allow_embedding: true
+
+    sidecar: #todo don't need a sidecar here
+      dashboards:
+        enabled: true
+        label: grafana_dashboard # kube-prometheus-stack mandates it be labelled this

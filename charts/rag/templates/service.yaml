@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "rag.fullname" $ }}
+  labels:
+    app.kubernetes.io/component: {{ include "rag.fullname" $ }}
+    {{- include "rag.labels" $ | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ports:
+    {{- range $port := .Values.ports }}
+    - port: {{ $port.containerPort }}
+      targetPort: http
+      protocol: {{ $port.protocol }}
+      name: {{ $port.name }}
+    {{- end }}
+  selector:
+    app.kubernetes.io/component: {{ include "rag.fullname" $ }}
+    {{- include "rag.selectorLabels" $ | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "rag.fullname" $ }}-postgres
+  labels:
+    app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
+    {{- include "rag.labels" $ | nindent 4 }}
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
+---
+{{- range $loadBalancer := .Values.additionalServices }}
+apiVersion: v1
+kind: Service
+metadata:
+  {{- with $loadBalancer.annotations }}
+  annotations: 
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ $loadBalancer.name }}
+spec:
+  {{- toYaml $loadBalancer.spec | nindent 2 }}
+---
+{{- end }}

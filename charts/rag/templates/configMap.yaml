@@ -1,0 +1,21 @@
+{{- range $map_name, $payload := .Values.configMaps }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $map_name }}
+  labels:
+    app.kubernetes.io/component: rag
+    {{- include "rag.labels" $ | nindent 4 }}
+{{ toYaml $payload }}
+---
+{{- end}}
+{{- if .Values.exportFeedback}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-mongodb-feedback-exporter
+data:
+  export_feedback.py: |
+{{ .Files.Get "export_feedback.py" | indent 4 }}
+---
+{{- end }}

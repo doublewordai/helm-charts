@@ -1,0 +1,14 @@
+{{- if .Values.clusterCatalog.enabled }}
+apiVersion: olm.operatorframework.io/v1
+kind: ClusterCatalog
+metadata:
+  name: inference-stack-catalog
+  labels:
+    {{- include "catalog.labels" . | nindent 4 }}
+  {{- with .Values.clusterCatalog.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- .Values.clusterCatalog.spec | toYaml | nindent 2 }}
+{{- end }}
