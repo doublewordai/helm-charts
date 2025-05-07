@@ -165,3 +165,49 @@ Convert env vars into dict
 
 {{- $zeusFrontendEnv | toYaml }}
 {{- end }}
+
+{{- define "console.zeusReconcilerEnv" -}}
+{{- $templateEnv := dict }}
+
+{{- /* ZEUS_NAME */}}
+{{- if eq .Values.cluster.role "leader" }}
+  {{- $_ := set $templateEnv "ZEUS_NAME" (dict "value" (default .Release.Name .Values.cluster.name)) }}
+{{- else }}
+  {{- $_ := set $templateEnv "ZEUS_NAME" (dict "value" (required "ERROR: cluster.name is required for follower mode" .Values.cluster.name)) }}
+{{- end }}
+
+{{- /* ZEUS_CLUSTER_NAMESPACE */}}
+{{- $_ := set $templateEnv "ZEUS_CLUSTER_NAMESPACE" (dict "value" .Release.Namespace) }}
+
+{{- /* ZEUS_INFERENCE_STACK_CR_NAME */}}
+{{- $_ := set $templateEnv "ZEUS_INFERENCE_STACK_CR_NAME" (dict "value" (include "console.inferenceStackCRName" .)) }}
+
+{{- /* ZEUS_CENTRAL_BASE_URL */}}
+{{- if eq .Values.cluster.role "leader" }}
+  {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (printf "http://%s-backend:%s" (include "console.fullname" .) (default "80" (toString .Values.backend.service.port)))) }}
+{{- else }}
+  {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (required "ERROR: reconciler.centralBaseURL is required for follower mode" .Values.cluster.reconciler.centralBaseURL)) }}
+{{- end }}
+
+{{- /* merge user-supplied */}}
+{{- $userEnv := dict }}
+{{- range $e := .Values.cluster.reconciler.env }}
+  {{- if hasKey $e "value" }}
+    {{- $_ := set $userEnv $e.name (dict "value" $e.value) }}
+  {{- else if hasKey $e "valueFrom" }}
+    {{- $_ := set $userEnv $e.name (dict "valueFrom" $e.valueFrom) }}
+  {{- end }}
+{{- end }}
+
+{{- /* assemble final list */}}
+{{- $envDict := merge $templateEnv $userEnv }}
+{{- $envList := list }}
+{{- range $k, $v := $envDict }}
+  {{- if $v.value }}
+    {{- $envList = append $envList (dict "name" $k "value" $v.value) }}
+  {{- else if $v.valueFrom }}
+    {{- $envList = append $envList (dict "name" $k "valueFrom" $v.valueFrom) }}
+  {{- end }}
+{{- end }}
+{{- toYaml $envList }}
+{{- end }}
