@@ -101,3 +101,45 @@ spec:
     app.kubernetes.io/component: debug
     {{- include "console.selectorLabels" . | nindent 4 }}
 {{- end }}
+---
+{{- if .Values.authentication.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "console.fullname" . }}-authentication
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+    app.kubernetes.io/component: authentication
+  {{- with .Values.authentication.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.authentication.service.type }}
+  {{- with .Values.authentication.service.ports }}
+  ports:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    app.kubernetes.io/component: authentication
+    {{- include "console.selectorLabels" . | nindent 4 }}
+{{- end }}
+---
+{{- if .Values.apikeys.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "console.fullname" . }}-apikeys
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+    app.kubernetes.io/component: apikeys
+spec:
+  type: ClusterIP
+  {{- with .Values.apikeys.service.ports }}
+  ports:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    app.kubernetes.io/component: apikeys
+    {{- include "console.selectorLabels" . | nindent 4 }}
+{{- end }}
