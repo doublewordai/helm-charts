@@ -508,19 +508,19 @@ spec:
               value: "{{ .Values.backend.service.port }}"
             - name: PORT
               value: "8080"
-          {{- with .Values.authentication.resources }}
+          {{- with .Values.apikeys.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.authentication.nodeSelector }}
+      {{- with .Values.apikeys.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.authentication.affinity }}
+      {{- with .Values.apikeys.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.authentication.tolerations }}
+      {{- with .Values.apikeys.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
