@@ -508,8 +508,6 @@ spec:
               value: "{{ .Values.backend.service.port }}"
             - name: PORT
               value: "8080"
-            - name: FORCE_RESPONSE
-              value: "200"  
           {{- with .Values.authentication.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
