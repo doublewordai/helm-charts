@@ -502,10 +502,10 @@ spec:
               port: http
               scheme: HTTP
           env:
-            - name: BACKEND_HOST
-              value: "apikeyserver.free.beeceptor.com"
+            - name: BACKEND_SERVICE
+              value: {{ include "console.fullname" $ }}-backend
             - name: BACKEND_PORT
-              value: "80"
+              value: "{{ .Values.backend.service.port }}"
             - name: PORT
               value: "8080"
             - name: FORCE_RESPONSE
