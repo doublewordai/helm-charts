@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "console.fullname" . }}-events
+  labels:
+    app.kubernetes.io/component: events
+spec:
+  serviceName: nats
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "console.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: events
+  template:
+    metadata:
+      labels:
+        {{- include "console.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: events
+    spec:
+      containers:
+        - name: nats
+          image: nats:2.11.3          
+          ports:
+            - containerPort: 4222
+              name: client
+            - containerPort: 6222
+              name: cluster
+            - containerPort: 8222
+              name: monitoring
+          volumeMounts:
+            - name: nats-data
+              mountPath: /var/lib/nats
+          env:
+           - name: NATS_LOG_LEVEL
+             value: debug
+           - name: NATS_CLUSTER_NAME
+             value: {{ include "console.fullname" . }}-events
+  volumeClaimTemplates:
+  - metadata:
+      name: nats-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "console.fullname" . }}-events
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+    app.kubernetes.io/component: events
+spec:
+  ports:
+  - port: 4222
+    targetPort: 4222
+    name: client
+  selector:
+    app.kubernetes.io/component: events
+    {{- include "console.selectorLabels" . | nindent 4 }}
+
+
+
+
+
