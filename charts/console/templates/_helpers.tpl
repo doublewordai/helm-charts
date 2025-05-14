@@ -166,7 +166,7 @@ Convert env vars into dict
 {{- $zeusFrontendEnv | toYaml }}
 {{- end }}
 
-{{- define "console.zeusReconcilerEnv" -}}
+{{- define "console.zeusSatelliteEnv" -}}
 {{- $templateEnv := dict }}
 
 {{- /* ZEUS_NAME */}}
@@ -186,12 +186,12 @@ Convert env vars into dict
 {{- if eq .Values.cluster.role "leader" }}
   {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (printf "http://%s-backend:%s" (include "console.fullname" .) (default "80" (toString .Values.backend.service.port)))) }}
 {{- else }}
-  {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (required "ERROR: reconciler.centralBaseURL is required for follower mode" .Values.cluster.reconciler.centralBaseURL)) }}
+  {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (required "ERROR: satellite.centralBaseURL is required for follower mode" .Values.cluster.satellite.centralBaseURL)) }}
 {{- end }}
 
 {{- /* merge user-supplied */}}
 {{- $userEnv := dict }}
-{{- range $e := .Values.cluster.reconciler.env }}
+{{- range $e := .Values.cluster.satellite.env }}
   {{- if hasKey $e "value" }}
     {{- $_ := set $userEnv $e.name (dict "value" $e.value) }}
   {{- else if hasKey $e "valueFrom" }}

@@ -49,7 +49,7 @@ gateway:
     # heartbeatCheckInterval: 1, // How frequently to check for dead readers. 0 means never
 ```
 
-See the `server_config` section of the config file [here](https://docs.titanml.co/apis/launch_parameters) for available parameters (note the snake_case settings for the container itself, vs. camelCase here)
+See the `server_config` section of the config file [here](https://docs.doubleword.ai/apis/launch_parameters) for available parameters (note the snake_case settings for the container itself, vs. camelCase here)
 
 #### Applications
 
@@ -76,7 +76,7 @@ applications:
 The `consumerGroup` setting is the `model` [key](https://platform.openai.com/docs/guides/text-generation) which you should provide to the gateway's openAI compatible API service.
 To create a service backed by several different applications, set the same `consumerGroup` on each of them.
 
-See the `reader_config` section of the config file [here](https://docs.titanml.co/apis/launch_parameters) for available parameters for the `readerConfig` (note the snake_case settings for the container itself, vs. camelCase here)
+See the `reader_config` section of the config file [here](https://docs.doubleword.ai/apis/launch_parameters) for available parameters for the `readerConfig` (note the snake_case settings for the container itself, vs. camelCase here)
 
 #### Application Template
 

@@ -40,18 +40,18 @@ ingress:
   #      - chart-example.local
 
 cluster:
-  # “leader” = bring up backend+frontend+db+reverseproxy+reconciler+inferenceStack
-  # “follower” = only reconciler+inferenceStack
-  role: leader
+  # “leader” = bring up backend+frontend+db+reverseproxy+satellite+inferenceStack
+  # “otherwise = only satellite+inferenceStack
+  leader: true
   # The name of the cluster to use. This is used to identify the cluster in the console. Must be unique across all clusters.
   # Will default to the name of the release for leader clusters, if not set. Must be set for follower clusters.
   name: ""  
 
-  reconciler:
+  satellite:
     replicaCount: 1
 
     image:
-      repository: tytn/zeus-reconciler
+      repository: tytn/zeus-satellite
       # Overrides the image tag whose default is the chart appVersion.
       tag: ""
       pullPolicy: IfNotPresent
@@ -61,7 +61,7 @@ cluster:
 
     env: []
 
-    # This doesnt need to be exposed - it is only used by k8s to check the health of the reconciler
+    # This doesnt need to be exposed - it is only used by k8s to check the health of the satellite
     ports:
     - name: health
       containerPort: 8080
@@ -328,7 +328,7 @@ tailscale:
 
 # /debug end-point - will show headers (including auth)
 debug:
-  enabled: false
+  enabled: true
   replicaCount: 1
   image:
     repository:  "mendhak/http-https-echo"
@@ -349,3 +349,28 @@ debug:
   podLabels: {}
   podSecurityContext: {}
   securityContext: {}
+
+
+apikeys:
+  enabled: true
+  image:
+    repository: tytn/zeus-apikeys
+    pullPolicy: IfNotPresent
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 8080
+    ports:
+      - port: 8080
+        targetPort: 8080
+        protocol: TCP
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+
+
