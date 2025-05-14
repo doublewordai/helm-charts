@@ -39,6 +39,44 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+cluster:
+  # “leader” = bring up backend+frontend+db+reverseproxy+satellite+inferenceStack
+  # “otherwise = only satellite+inferenceStack
+  leader: true
+  # The name of the cluster to use. This is used to identify the cluster in the console. Must be unique across all clusters.
+  # Will default to the name of the release for leader clusters, if not set. Must be set for follower clusters.
+  name: ""  
+
+  satellite:
+    replicaCount: 1
+
+    image:
+      repository: tytn/zeus-satellite
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+      pullPolicy: IfNotPresent
+
+    # If this is the leader cluster, the url will be generated automatically. If this is a follower, it must be configured
+    centralBaseURL: ""
+
+    env: []
+
+    # This doesnt need to be exposed - it is only used by k8s to check the health of the satellite
+    ports:
+    - name: health
+      containerPort: 8080
+      protocol: TCP
+
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: health
+    readinessProbe:
+      httpGet:
+        path: /healthz
+        port: health
+
+
 # This section is for setting up the Inference Stack Custom Resource that is deployed and managed by the console. The crdVersion is
 # the version of the Custom Resource Definition that is being used. The operatorVersion is the version of the operator that is being
 # used to manage the Custom Resource. See the ../../CHANGELOG.md for more information on the versions.
