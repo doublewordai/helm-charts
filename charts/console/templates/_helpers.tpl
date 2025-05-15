@@ -94,7 +94,7 @@ Create a template for necessary environment variables for Zeus backend
 {{- $_ := set $templateEnv "ZEUS_INFERENCE_STACK_CR_NAME" (dict "value" ( include "console.inferenceStackCRName" $ )) }}
 {{- $_ := set $templateEnv "ZEUS_CLUSTER_NAMESPACE" (dict "value" .Release.Namespace) }}
 {{- $_ := set $templateEnv "ZEUS_ENABLE_NATS" (dict "value" "True") }}
-{{- $_ := set $templateEnv "ZEUS_NATS_URL" (dict "value" (printf "%s-events" (include "console.fullname" .))) }}
+{{- $_ := set $templateEnv "ZEUS_NATS_URL" (dict "value" (printf "nats://%s-events:4222" (include "console.fullname" .))) }}
 
 {{/* 
 Convert user set env vars into dict 
