@@ -1,4 +1,4 @@
-{{- if eq .Values.cluster.role "leader" }}
+{{- if .Values.cluster.leader }}
 # Postgres Database
 apiVersion: apps/v1
 kind: StatefulSet
@@ -68,4 +68,5 @@ spec:
   selector:
     app.kubernetes.io/component: db
     {{- include "console.selectorLabels" . | nindent 4 }}
-{{- end }}
+---
+{{- end }} # if .Values.cluster.leader }}

@@ -170,7 +170,7 @@ Convert env vars into dict
 {{- $templateEnv := dict }}
 
 {{- /* ZEUS_NAME */}}
-{{- if eq .Values.cluster.role "leader" }}
+{{- if .Values.cluster.leader }}
   {{- $_ := set $templateEnv "ZEUS_NAME" (dict "value" (default .Release.Name .Values.cluster.name)) }}
 {{- else }}
   {{- $_ := set $templateEnv "ZEUS_NAME" (dict "value" (required "ERROR: cluster.name is required for follower mode" .Values.cluster.name)) }}
@@ -183,7 +183,7 @@ Convert env vars into dict
 {{- $_ := set $templateEnv "ZEUS_INFERENCE_STACK_CR_NAME" (dict "value" (include "console.inferenceStackCRName" .)) }}
 
 {{- /* ZEUS_CENTRAL_BASE_URL */}}
-{{- if eq .Values.cluster.role "leader" }}
+{{- if .Values.cluster.leader }}
   {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (printf "http://%s-backend:%s" (include "console.fullname" .) (default "80" (toString .Values.backend.service.port)))) }}
 {{- else }}
   {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (required "ERROR: satellite.centralBaseURL is required for follower mode" .Values.cluster.satellite.centralBaseURL)) }}

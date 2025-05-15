@@ -1,4 +1,4 @@
-{{- if and (eq .Values.cluster.role "leader") .Values.tailscale.enabled -}}
+{{- if and (.Values.cluster.leader) .Values.tailscale.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
