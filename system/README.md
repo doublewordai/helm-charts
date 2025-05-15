@@ -28,7 +28,7 @@ Before you begin, ensure you have the following installed:
 
    ```bash
    mkdir -p /tmp/helmfile/ && \
-      sudo wget -P /tmp/helmfile/ https://github.com/helmfile/helmfile/releases/download/v0.171.0/helmfile_0.171.0_linux_amd64.tar.gz && \ 
+      sudo wget -P /tmp/helmfile/ https://github.com/helmfile/helmfile/releases/download/v0.171.0/helmfile_0.171.0_linux_amd64.tar.gz && \
       sudo tar -xxf /tmp/helmfile/helmfile_0.171.0_linux_amd64.tar.gz -C /tmp/helmfile/ && \
       sudo mv /tmp/helmfile/helmfile /usr/local/bin && \
       sudo chmod +x /usr/local/bin/helmfile && \
