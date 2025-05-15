@@ -1,4 +1,4 @@
-{{- if eq .Values.cluster.role "leader" }}
+{{- if .Values.cluster.leader }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -529,7 +529,7 @@ spec:
       {{- end }}
 {{- end}}
 
-{{- end}} # if .Values.cluster.role "leader" }}
+{{- end}} # if .Values.cluster.leader }}
 ---
 apiVersion: apps/v1
 kind: Deployment

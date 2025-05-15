@@ -1,4 +1,4 @@
-{{- if eq .Values.cluster.role "leader" }}
+{{- if .Values.cluster.leader }}
 
 apiVersion: v1
 kind: Service
@@ -123,4 +123,4 @@ spec:
     {{- include "console.selectorLabels" . | nindent 4 }}
 {{- end }}
 
-{{- end}}
+{{- end}} # if .Values.cluster.leader }}

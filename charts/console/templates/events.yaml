@@ -1,3 +1,5 @@
+{{- if .Values.cluster.leader }}
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -61,7 +63,4 @@ spec:
     app.kubernetes.io/component: events
     {{- include "console.selectorLabels" . | nindent 4 }}
 
-
-
-
-
+{{- end }} # if .Values.cluster.leader }}
