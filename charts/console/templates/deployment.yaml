@@ -453,7 +453,7 @@ metadata:
     {{- include "console.labels" $ | nindent 4 }}
     app.kubernetes.io/component: apikeys
 spec:
-  replicas: {{ .Values.authentication.replicaCount }}
+  replicas: {{ .Values.apikeys.replicaCount }}
   selector:
     matchLabels:
       {{- include "console.selectorLabels" . | nindent 6 }}
