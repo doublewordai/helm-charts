@@ -60,3 +60,6 @@ The Controller in this context is a sub-component of the Operator that watches t
 * Reader: an individual model that is running in the Inference Stack. It connects to the server of the Gateway to pull requests and process them.
 
 * Consumer Group: the group of collective Readers that pull from a single queue. Note, Readers can belong to more than one consumer group, so there is a many-to-many mapping between Readers and Queues.
+
+....
+
