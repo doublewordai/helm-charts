@@ -168,6 +168,32 @@ Convert env vars into dict
 {{- $zeusFrontendEnv | toYaml }}
 {{- end }}
 
+{{/* ---------- CENTRAL-SITE HOST (no scheme/port) ---------- */}}
+{{- define "console.centralHost" -}}
+{{- $host := .Values.cluster.satellite.centralBaseHost | default "" -}}
+{{- if eq $host "" }}
+    {{- $raw := .Values.cluster.satellite.centralBaseURL | default "" -}}
+    {{- $host = regexReplaceAll "(?i)^https?://([^/:]+)(:[0-9]+)?/?$" $raw "$1" -}}
+{{- end -}}
+{{- trim $host -}}
+{{- end }}
+
+{{/* ---------- PORT CHOOSER  --------------------------------- */}}
+{{- define "console.centralPort" -}}
+{{- /* If interconnect is on → use its port, else use backend svc port */ -}}
+{{- if .Values.cluster.interconnect.enabled -}}
+    {{- int (default 8080 .Values.cluster.interconnect.port) -}}
+{{- else -}}
+    {{- int (default 80     .Values.backend.service.port)    -}}
+{{- end -}}
+{{- end }}
+
+{{/* ---------- FULL CENTRAL URL (scheme://host:port) ---------- */}}
+{{- define "console.centralURL" -}}
+{{- $scheme := .Values.cluster.satellite.centralBaseScheme | default "http" -}}
+{{- printf "%s://%s:%d" $scheme (include "console.centralHost" .) (include "console.centralPort" . | int) -}}
+{{- end }}
+
 {{- define "console.zeusSatelliteEnv" -}}
 {{- $templateEnv := dict }}
 
@@ -184,11 +210,27 @@ Convert env vars into dict
 {{- /* ZEUS_INFERENCE_STACK_CR_NAME */}}
 {{- $_ := set $templateEnv "ZEUS_INFERENCE_STACK_CR_NAME" (dict "value" (include "console.inferenceStackCRName" .)) }}
 
-{{- /* ZEUS_CENTRAL_BASE_URL */}}
+{{/* ---------- ZEUS_CENTRAL_BASE_URL ------------------------ */}}
 {{- if .Values.cluster.leader }}
-  {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (printf "http://%s-backend:%s" (include "console.fullname" .) (default "80" (toString .Values.backend.service.port)))) }}
+    {{- if .Values.cluster.interconnect.enabled }}
+        {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL"
+             (dict "value" (include "console.centralURL" $)) }}
+    {{- else }}
+        {{- $p := int (default 80 .Values.backend.service.port) -}}
+        {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL"
+             (dict "value"
+                   (printf "http://%s-backend:%d"
+                           (include "console.fullname" $) $p)) }}
+    {{- end }}
 {{- else }}
-  {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (required "ERROR: satellite.centralBaseURL is required for follower mode" .Values.cluster.satellite.centralBaseURL)) }}
+    {{/* ---------- follower mode ---------- */}}
+    {{- /* fail fast if user forgot to set host */}}
+    {{- $_ := required
+        "cluster.satellite.centralBaseHost (or centralBaseURL) must be set for follower mode"
+        (include "console.centralHost" $) }}
+
+    {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL"
+         (dict "value" (include "console.centralURL" $)) }}
 {{- end }}
 
 {{- /* merge user-supplied */}}

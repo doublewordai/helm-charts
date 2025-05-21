@@ -47,6 +47,13 @@ cluster:
   # Will default to the name of the release for leader clusters, if not set. Must be set for follower clusters.
   name: ""  
 
+  # Enable interconnect for the cluster. This will allow the cluster to communicate with other clusters in the same interconnect group.
+  # A single-cluster setup will work with interconnect.enabled: true, but may come at a miniscule performance cost.
+  interconnect:
+    enabled: true
+    port: 8080  
+    linkAccess: none # "none", "default", "loadbalancer"
+
   satellite:
     replicaCount: 1
 
@@ -56,8 +63,10 @@ cluster:
       tag: ""
       pullPolicy: IfNotPresent
 
-    # If this is the leader cluster, the url will be generated automatically. If this is a follower, it must be configured
-    centralBaseURL: ""
+    # If this chart is installed in follower mode, tell us **just the
+    # host-part** of the leader’s listener; we’ll add scheme + port.
+    centralBaseHost: ""        # e.g.  primary-backend
+    centralBaseScheme: "http"  # or "https"
 
     env: []
 
@@ -75,6 +84,7 @@ cluster:
       httpGet:
         path: /healthz
         port: health
+
 
 
 # This section is for setting up the Inference Stack Custom Resource that is deployed and managed by the console. The crdVersion is

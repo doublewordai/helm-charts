@@ -1,0 +1,29 @@
+{{- if and .Values.cluster.interconnect.enabled .Values.cluster.leader }}
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "console.fullname" . }}-skupper
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "console.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ["skupper.io"]
+    resources: ["sites", "accessgrants", "accesstokens"]
+    verbs: ["get", "list", "create"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "console.fullname" . }}-skupper
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "console.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "console.serviceAccountName" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "console.fullname" . }}-skupper
+
+{{- end }}

@@ -1,0 +1,60 @@
+{{/*
+────────────────────────────────────────────────────────
+  Skupper resources for cross-cluster traffic
+  – Site         : every install (except dry-run upgrades)
+  – Connector    : leader only   (exposes backend)
+  – Listener     : always        (leader + followers)
+────────────────────────────────────────────────────────*/}}
+
+{{- $listenerPort := int (default 8080 .Values.cluster.interconnect.port) -}}
+{{- $routingKey    := printf "%s-backend" (include "console.fullname" .)  -}}
+
+{{/* ── Site ─────────────────────────────────────────────────────── */}}
+{{- if and .Values.cluster.interconnect.enabled (not .Release.IsUpgrade) }}
+apiVersion: skupper.io/v2alpha1
+kind: Site
+metadata:
+  name: {{ include "console.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  linkAccess: {{ .Values.cluster.interconnect.linkAccess | default "none" }}
+---
+{{- end }}
+
+{{/* ── Connector (leader only) ──────────────────────────────────── */}}
+{{- if and .Values.cluster.leader .Values.cluster.interconnect.enabled }}
+apiVersion: skupper.io/v2alpha1
+kind: Connector
+metadata:
+  name: {{ $routingKey }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  routingKey: {{ $routingKey }}
+  port: {{ (index .Values.backend.ports 0).containerPort | default 8000 }}
+  selector: >
+    app.kubernetes.io/component=backend,
+    app.kubernetes.io/instance={{ .Release.Name }}
+---
+{{- end }}
+
+{{/* ── Listener (leader + followers) ────────────────────────────── */}}
+{{- /* Host the satellites will use.  Followers read from values,
+        leaders default to "<release>-backend".                 */}}
+{{- if and (not .Values.cluster.leader) .Values.cluster.interconnect.enabled }}
+{{- $host := include "console.centralHost" . | default $routingKey -}}
+apiVersion: skupper.io/v2alpha1
+kind: Listener
+metadata:
+  name: {{ $routingKey }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  host:       {{ $host }}
+  port:       {{ $listenerPort }}
+  routingKey: {{ $routingKey }}
+{{- end}}
