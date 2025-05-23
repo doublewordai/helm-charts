@@ -52,7 +52,7 @@ cluster:
   interconnect:
     enabled: true
     port: 8080  
-    linkAccess: none # "none", "default", "loadbalancer"
+    linkAccess: default # "none", "default", "loadbalancer"
 
   satellite:
     replicaCount: 1
@@ -62,6 +62,8 @@ cluster:
       # Overrides the image tag whose default is the chart appVersion.
       tag: ""
       pullPolicy: IfNotPresent
+
+    provider: "on-prem" # "on-prem", "aws", "azure", "gcp"
 
     # If this chart is installed in follower mode, tell us **just the
     # host-part** of the leader’s listener; we’ll add scheme + port.
