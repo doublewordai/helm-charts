@@ -80,12 +80,8 @@ data:
         internal_port: 3005
       readers_config:
         {{ $appName }}:
-          {{- $readerConfigTemplate := printf `
-          internalGatewayIp: %s-gateway
-          ` (include "inference-stack.fullname" $) }}
-          {{- $templateReaderConfig := fromYaml $readerConfigTemplate }}
-          {{- $finalReadersConfig := merge $mergedValues.readerConfig $templateReaderConfig }}
-          {{- range $key, $value := $finalReadersConfig }}
+          internal_gateway_ip: {{ default (printf "%s-gateway" (include "inference-stack.fullname" $)) $mergedValues.readerConfig.internalGatewayIp }}
+          {{- range $key, $value := omit $mergedValues.readerConfig "internalGatewayIp" }}
           {{ snakecase $key }}: {{ $value }}
           {{- end }}
 ---

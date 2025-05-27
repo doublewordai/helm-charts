@@ -51,7 +51,7 @@ cluster:
   # A single-cluster setup will work with interconnect.enabled: true, but may come at a miniscule performance cost.
   interconnect:
     enabled: true
-    port: 8080  
+    port: 8001  
     linkAccess: default # "none", "default", "loadbalancer"
 
   satellite:
