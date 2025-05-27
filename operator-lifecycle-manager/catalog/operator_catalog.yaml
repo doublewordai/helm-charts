@@ -20,4 +20,4 @@ Fast:
   - Image: docker.io/tytn/operator-bundle:2.2.2
   - Image: docker.io/tytn/operator-bundle:2.2.3
   - Image: docker.io/tytn/operator-bundle:2.2.4
-
+  - Image: docker.io/tytn/operator-bundle:2.3.0
