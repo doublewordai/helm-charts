@@ -21,6 +21,7 @@ spec:
     app.kubernetes.io/component: frontend
     {{- include "console.selectorLabels" . | nindent 4 }}
 ---
+{{- if .Values.cluster.leader }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -42,6 +43,7 @@ spec:
   selector:
     app.kubernetes.io/component: backend
     {{- include "console.selectorLabels" . | nindent 4 }}
+{{- end }}
 ---
 {{- if .Values.reverseproxy.enabled }}
 apiVersion: v1

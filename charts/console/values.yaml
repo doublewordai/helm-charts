@@ -47,21 +47,38 @@ cluster:
   # Will default to the name of the release for leader clusters, if not set. Must be set for follower clusters.
   name: ""  
 
+  # Enable interconnect for the cluster. This deploys the the infrastucture required to connect to other clusters. 
+  # A single-cluster setup will work with interconnect.enabled: true, but will deploy unused resources.
+  interconnect:
+    enabled: true
+    port: 8001  
+    linkAccess: default # "none", "default", "loadbalancer". "default" required only for leader clusters, "none" recommended follower clusters.
+
   satellite:
     replicaCount: 1
-
     image:
       repository: tytn/zeus-satellite
       # Overrides the image tag whose default is the chart appVersion.
       tag: ""
       pullPolicy: IfNotPresent
 
-    # If this is the leader cluster, the url will be generated automatically. If this is a follower, it must be configured
-    centralBaseURL: ""
+    provider: "on-prem" # "on-prem", "aws", "azure", "gcp"
+
+    # follower-only settings ───────────────────────────────────────────
+    # Tell us the *release name* of the leader cluster.  We derive the two
+    # service FQDNs from it:
+    #   <release>-backend              (HTTP backend)
+    #   <release>-stack-gateway        (gRPC gateway)
+    centralRelease: ""       # e.g.  console
+
+    # If you prefer to override either host explicitly you can – leave the
+    # field empty to keep the auto-derived default. If centralRelease is blank, both of these must be set.
+    centralBackendHost: ""   # e.g.  console-backend
+    centralGatewayHost: ""   # e.g.  console-stack-gateway
 
     env: []
 
-    # This doesnt need to be exposed - it is only used by k8s to check the health of the satellite
+    # Health check for kubernetes.
     ports:
     - name: health
       containerPort: 8080

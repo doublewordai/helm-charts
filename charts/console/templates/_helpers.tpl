@@ -168,28 +168,97 @@ Convert env vars into dict
 {{- $zeusFrontendEnv | toYaml }}
 {{- end }}
 
+
+{{/* ---------- zeusSatelliteEnv ------------------------------ */}}
+
+{{- if and (not .Values.cluster.leader) .Values.cluster.interconnect.enabled }}
+  {{- required "ERROR: in follower mode you must set cluster.satellite.centralRelease or BOTH centralBackendHost and centralGatewayHost" 
+      (or .Values.cluster.satellite.centralRelease 
+          (and .Values.cluster.satellite.centralBackendHost .Values.cluster.satellite.centralGatewayHost)) }}
+{{- end }}
+
+{{/* ---------- CENTRAL-SITE HOST (no scheme / port) ---------- */}}
+{{- define "console.centralHost" }}
+  {{- if .Values.cluster.leader }}
+    {{- /* leader always uses its own backend */ -}}
+    {{- printf "%s-backend" (include "console.fullname" .) }}
+  {{- else }}
+    {{- /* follower: first try a custom override */ -}}
+    {{- $custom := .Values.cluster.satellite.centralBackendHost | default "" }}
+    {{- if ne $custom "" }}
+      {{- $custom }}
+    {{- else }}
+      {{- /* next fall back to centralRelease if set */ -}}
+      {{- $rel := .Values.cluster.satellite.centralRelease | default "" }}
+      {{- if ne $rel "" }}
+        {{- printf "%s-backend" $rel }}
+      {{- else }}
+        {{- /* finally error if neither is provided */ -}}
+        {{- required "ERROR: in follower mode you must set cluster.satellite.centralRelease or centralBackendHost" .Values.cluster.satellite.centralRelease }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+{{/* ---------- CENTRAL-SITE PORT ---------------------------- */}}
+{{- define "console.centralPort" -}}
+  {{- /* Leader always use backend svc port, otherwise if interconnect on use its port */ -}}
+  {{- if .Values.cluster.leader -}}
+    {{- int (default 80 .Values.backend.service.port) -}}
+  {{- else if .Values.cluster.interconnect.enabled -}}
+    {{- int .Values.cluster.interconnect.port -}}
+  {{- else -}}
+    {{- int (default 80 .Values.backend.service.port) -}}
+  {{- end -}}
+{{- end }}
+
+{{/* ---------- FULL CENTRAL URL (scheme://host:port) --------- */}}
+{{- define "console.centralURL" -}}
+  {{- $host := include "console.centralHost" . -}}
+  {{- $port := include "console.centralPort" . | int -}}
+  {{- printf "http://%s:%d" $host $port -}}
+{{- end }}
+
 {{- define "console.zeusSatelliteEnv" -}}
 {{- $templateEnv := dict }}
 
-{{- /* ZEUS_NAME */}}
+{{/* ---------- ZEUS_NAME ------------------------------------- */}}
 {{- if .Values.cluster.leader }}
   {{- $_ := set $templateEnv "ZEUS_NAME" (dict "value" (default .Release.Name .Values.cluster.name)) }}
 {{- else }}
   {{- $_ := set $templateEnv "ZEUS_NAME" (dict "value" (required "ERROR: cluster.name is required for follower mode" .Values.cluster.name)) }}
 {{- end }}
 
-{{- /* ZEUS_CLUSTER_NAMESPACE */}}
+{{/* ---------- ZEUS_CLUSTER_NAMESPACE ----------------------- */}}
 {{- $_ := set $templateEnv "ZEUS_CLUSTER_NAMESPACE" (dict "value" .Release.Namespace) }}
 
-{{- /* ZEUS_INFERENCE_STACK_CR_NAME */}}
+{{/* ---------- ZEUS_INFERENCE_STACK_CR_NAME ------------------ */}}
 {{- $_ := set $templateEnv "ZEUS_INFERENCE_STACK_CR_NAME" (dict "value" (include "console.inferenceStackCRName" .)) }}
 
-{{- /* ZEUS_CENTRAL_BASE_URL */}}
-{{- if .Values.cluster.leader }}
-  {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (printf "http://%s-backend:%s" (include "console.fullname" .) (default "80" (toString .Values.backend.service.port)))) }}
-{{- else }}
-  {{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL" (dict "value" (required "ERROR: satellite.centralBaseURL is required for follower mode" .Values.cluster.satellite.centralBaseURL)) }}
+{{/* ---------- ZEUS_PROVIDER -------------------------------- */}}
+{{- if .Values.cluster.satellite.provider }}
+  {{- $_ := set $templateEnv "ZEUS_PROVIDER" (dict "value" .Values.cluster.satellite.provider) }}
 {{- end }}
+
+{{/* ---------- ZEUS_CENTRAL_BASE_URL ------------------------ */}}
+{{- $_ := set $templateEnv "ZEUS_CENTRAL_BASE_URL"
+     (dict "value" (include "console.centralURL" .)) }}
+
+{{- /* ZEUS_CENTRAL_GATEWAY_HOST & PORT */ -}}
+{{- $gwHost := "" -}}
+{{- if .Values.cluster.leader -}}
+  {{- /* leader always points at its own gateway */ -}}
+  {{- $gwHost = printf "%s-stack-gateway" (include "console.fullname" .) -}}
+{{- else -}}
+  {{- /* follower: prefer an explicit override */ -}}
+  {{- if .Values.cluster.satellite.centralGatewayHost -}}
+    {{- $gwHost = .Values.cluster.satellite.centralGatewayHost -}}
+  {{- else -}}
+    {{- $gwHost = printf "%s-stack-gateway" .Values.cluster.satellite.centralRelease -}}
+  {{- end -}}
+{{- end -}}
+{{- $_ := set $templateEnv "ZEUS_CENTRAL_GATEWAY_HOST" (dict "value" $gwHost) -}}
+{{- $_ := set $templateEnv "ZEUS_CENTRAL_GATEWAY_PORT" (dict "value" "3005") -}}
 
 {{- /* merge user-supplied */}}
 {{- $userEnv := dict }}

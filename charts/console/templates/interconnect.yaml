@@ -1,0 +1,98 @@
+{{/*
+────────────────────────────────────────────────────────
+  Skupper resources
+    – Site      : every install (except dry-run upgrades)
+    – Connector : leader only   (exposes backend & gateway)
+    – Listener  : follower only (pulls both backend & gateway)
+────────────────────────────────────────────────────────*/}}
+
+{{- $release    := include "console.fullname" . -}}
+{{- $port       := int (default 8080 .Values.cluster.interconnect.port) -}}
+{{- $backendKey := printf "%s-backend" $release -}}
+{{- $gatewayKey := printf "%s-stack-gateway" $release -}}
+
+{{/* ── Site ──────────────────────────────────────────────────── */}}
+{{- if .Values.cluster.interconnect.enabled }}
+---
+apiVersion: skupper.io/v2alpha1
+kind: Site
+metadata:
+  name: {{ $release }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  linkAccess: {{ .Values.cluster.interconnect.linkAccess | default "none" }}
+{{- end }}
+
+{{/* ── Connector (leader only) ─────────────────────────────── */}}
+{{- if and .Values.cluster.leader .Values.cluster.interconnect.enabled }}
+---
+# HTTP backend on central
+apiVersion: skupper.io/v2alpha1
+kind: Connector
+metadata:
+  name: {{ $backendKey }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  routingKey: {{ $backendKey }}
+  port:       {{ (index .Values.backend.ports 0).containerPort | default 8000 }}
+  selector: >
+    app.kubernetes.io/component=backend,
+    app.kubernetes.io/instance={{ .Release.Name }}
+
+---
+# gRPC gateway on central
+apiVersion: skupper.io/v2alpha1
+kind: Connector
+metadata:
+  name: {{ $gatewayKey }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  routingKey: {{ $gatewayKey }}
+  port:       3005
+  selector: >
+    app.kubernetes.io/component=gateway,
+    app.kubernetes.io/instance={{ .Release.Name }}-stack
+{{- end }}
+
+{{/* ── Listener (followers only) ────────────────────────────── */}}
+{{- if and (not .Values.cluster.leader) .Values.cluster.interconnect.enabled }}
+  {{- /* require a centralRelease */ -}}
+  {{- $cr    := required "ERROR: in follower mode set cluster.satellite.centralRelease" .Values.cluster.satellite.centralRelease -}}
+  {{- $bHost := default (printf "%s-backend" $cr) .Values.cluster.satellite.centralBackendHost -}}
+  {{- $gHost := default (printf "%s-stack-gateway" $cr) .Values.cluster.satellite.centralGatewayHost -}}
+  {{- $bKey  := printf "%s-backend" $cr -}}
+  {{- $gKey  := printf "%s-stack-gateway" $cr -}}
+---
+# HTTP backend listener on satellite
+apiVersion: skupper.io/v2alpha1
+kind: Listener
+metadata:
+  name: {{ $bKey }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  host:       {{ $bHost }}
+  port:       {{ $port }}
+  routingKey: {{ $bKey }}
+
+---
+# gRPC gateway listener on satellite
+apiVersion: skupper.io/v2alpha1
+kind: Listener
+metadata:
+  name: {{ $gKey }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "console.labels" . | nindent 4 }}
+spec:
+  host:       {{ $gHost }}
+  port:       3005
+  routingKey: {{ $gKey }}
+{{- end }}
