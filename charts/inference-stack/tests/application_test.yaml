@@ -32,10 +32,10 @@ tests:
             internal_port: 3005
           readers_config:
             hello-world-1:
+              internal_gateway_ip: test-release-inference-stack-gateway
               buffer_requests: true
               consumer_group: primary
               device: cpu
-              internal_gateway_ip: test-release-inference-stack-gateway
               model_name: TitanML/dummy_model
 
 - it: should correctly merge application values with template
@@ -51,10 +51,10 @@ tests:
             internal_port: 3005
           readers_config:
             hello-world-2:
+              internal_gateway_ip: test-release-inference-stack-gateway
               buffer_requests: true
               consumer_group: secondary
               device: cuda
-              internal_gateway_ip: test-release-inference-stack-gateway
               model_name: custom/model
 
 - it: should properly configure application deployment with template values
