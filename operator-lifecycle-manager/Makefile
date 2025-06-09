@@ -57,8 +57,8 @@ endif
 OPERATOR_SDK_VERSION ?= v1.39.1
 
 # Source and destination paths for chart syncing
-SOURCE_CHART_PATH := ../charts/inference-stack
-DEST_CHART_PATH := helm-charts/inference-stack
+SOURCE_CHART_PATH ?= ../charts/inference-stack
+DEST_CHART_PATH ?= helm-charts/inference-stack
 
 ##@ General
 
@@ -163,10 +163,16 @@ endif
 endif
 
 .PHONY: sed
-ifeq (,$(shell which gsed 2>/dev/null))
-SED = sed
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+  # On macOS, require gsed
+  ifeq (,$(shell which gsed 2>/dev/null))
+    $(error "gsed is required on macOS but not found. Please install it via 'brew install gnu-sed'")
+  endif
+  SED = gsed
 else
-SED = gsed
+  # On other systems, just use sed
+  SED = sed
 endif
 
 .PHONY: install
@@ -204,16 +210,39 @@ bundle: sed yq kustomize operator-sdk sync-charts ## Generate bundle manifests a
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS)
 	$(OPERATOR_SDK) bundle validate ./bundle
 
+DOCKER ?= docker
+
+.PHONY: bundle-build
+bundle-build: bundle ## Build then pushes the bundle and operator images.
+	$(DOCKER) build -t $(CONTROLLER_IMAGE) . --platform $(IMAGE_PLATFORMS)
+	$(DOCKER) build -f bundle.Dockerfile -t $(BUNDLE_IMAGE) . --platform $(IMAGE_PLATFORMS)
+
+.PHONY: bundle-push
+bundle-push: bundle-build
+	$(DOCKER) push $(CONTROLLER_IMAGE) --platform $(IMAGE_PLATFORMS)
+	$(DOCKER) push $(BUNDLE_IMAGE) --platform  $(IMAGE_PLATFORMS)
+
 .PHONY: bundle-build-push
-bundle-build-push: bundle ## Build then pushes the bundle and operator images.
-	depot build -t ${CONTROLLER_IMAGE} . --push --platform $(IMAGE_PLATFORMS)
-	depot build -f bundle.Dockerfile -t $(BUNDLE_IMAGE) . --push --platform $(IMAGE_PLATFORMS)
+bundle-build-push: bundle-push
 
 # Build and push the catalog image, you need to have updated the catalog/operator_catalog.yaml file with the new version to add it 
 # to the catalog. The catalog image is used to deploy the catalog to the cluster.
-.PHONY: catalog-build-push
-catalog-build-push: opm ## Build and push the catalog image.
+
+.PHONY: catalog
+catalog: opm ## Build and push the catalog image.
 	mkdir -p catalog/configs
 	$(OPM) alpha render-template semver -o yaml < catalog/operator_catalog.yaml > catalog/configs/catalog.yaml
 	$(OPM) validate catalog/configs
-	depot build -f catalog.Dockerfile --build-arg "CATALOG_DIR=catalog/configs" -t $(CATALOG_IMAGE) . --push --platform $(IMAGE_PLATFORMS)
+
+.PHONY: catalog-build
+catalog-build: catalog
+	$(DOCKER) build -f catalog.Dockerfile --build-arg "CATALOG_DIR=catalog/configs" -t $(CATALOG_IMAGE) . --platform $(IMAGE_PLATFORMS)
+
+.PHONY: catalog-push
+catalog-push: catalog-build
+	$(DOCKER) push $(CATALOG_IMAGE) --platform $(IMAGE_PLATFORMS)
+
+.PHONY: catalog-build-push
+catalog-build-push: catalog-push
+
+
