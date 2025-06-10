@@ -1,0 +1,26 @@
+{{- if .Values.enableMetrics }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: http-alerts
+  namespace: monitoring
+  labels:
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+    - name: http-alerts
+      rules:
+        - alert: ConsumerGroupHttpErrorsDetected
+          expr: |
+            sum by (consumer_group) (
+              count_over_time(http_requests_total{status=~"4..|5..", path=~".*generate.*"}[5m])
+            ) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Calls to generate with status codes 400-599 detected"
+            description: |
+              HTTP 4xx or 5xx responses have been detected for one or more consumer groups in the last 5 minutes.
+{{- end }}
