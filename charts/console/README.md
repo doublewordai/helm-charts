@@ -51,8 +51,8 @@ In the Azure Portal, configure the Directory.   Choose 'Manage', 'App registrati
 | Name                    | Doubleword Console                                         |
 | Supported account types | Accounts in this organizational directory only             |
 | Redirect URI Platform   | Web                                                        |
-| Redirect URI            | https://doubleword.yourdomain.example/authentication/auth  |
-                          
+| Redirect URI            | <https://doubleword.yourdomain.example/authentication/auth>  |
+
 The Redirect URI does not have to be accessible to the Internet.
 
 #### Create a client secret
@@ -70,7 +70,7 @@ Click 'Add', then record the 'Value' and the 'Secret ID' to use later.
 
 Click 'Manage', 'App Registrations', 'Endpoints' and use the displayed information to complete these values in `values.yaml`:
 
-```
+```yaml
 authentication:
   sso:
     publicAccess: false
@@ -84,7 +84,7 @@ authentication:
 
 #### Testing
 
-Go to *https://doubleword.yourdomain.example*
+Go to *<https://doubleword.yourdomain.example>*
 
 Assuming the configuration is correct, it will redirect to the Microsoft sign in page. After signing in, Microsoft will redirect back to the application.
 
@@ -92,17 +92,11 @@ Assuming the configuration is correct, it will redirect to the Microsoft sign in
 
 Add to the `values.yaml`:
 
-```
+```yaml
 debug:
   enabled: true
 ```
 
-Then visit *https://doubleword.yourdomain.example/debug*
+Then visit *<https://doubleword.yourdomain.example/debug>*
 
 The response should contain a `X-Doubleword-User` header containing the email address of the user.
-
-
-
-
-
-
