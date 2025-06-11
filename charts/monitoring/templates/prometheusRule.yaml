@@ -13,8 +13,8 @@ spec:
       rules:
         - alert: ConsumerGroupHttpErrorsDetected
           expr: |
-            sum by (consumer_group) (
-              count_over_time(http_requests_total{status=~"4..|5..", path=~".*generate.*"}[5m])
+            sum by (namespace, service, path, consumer_group) (
+              increase(http_requests_total{status=~"4..|5..", path=~".*generate.*"}[5m])
             ) > 0
           for: 5m
           labels:
