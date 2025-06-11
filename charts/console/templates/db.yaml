@@ -23,6 +23,7 @@ spec:
       containers:
       - name: postgres
         image: postgres:17
+        resources: {}
         ports:
         - containerPort: 5432
           name: postgres
@@ -45,7 +46,9 @@ spec:
         - name: {{ include "console.fullname" . }}-db
           mountPath: /data
   volumeClaimTemplates:
-  - metadata:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
       name: {{ include "console.fullname" . }}-db
       labels:
         {{- include "console.labels" . | nindent 8 }}

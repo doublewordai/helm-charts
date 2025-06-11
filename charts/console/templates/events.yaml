@@ -22,6 +22,7 @@ spec:
       containers:
         - name: nats
           image: nats:2.11.3          
+          resources: {}
           ports:
             - containerPort: 4222
               name: client
@@ -38,7 +39,9 @@ spec:
            - name: NATS_CLUSTER_NAME
              value: {{ include "console.fullname" . }}-events
   volumeClaimTemplates:
-  - metadata:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
       name: nats-data
     spec:
       accessModes:
