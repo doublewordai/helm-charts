@@ -363,13 +363,13 @@ spec:
             - name: TLS_CERTIFICATE_PEM
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
-                  key: tlsCertificatePem
+                  name: {{ .Values.reverseproxy.secretName }}
+                  key: {{ .Values.reverseproxy.keys.certificate }}
             - name: TLS_PRIVATE_KEY_PEM
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
-                  key: tlsPrivateKeyPem
+                  name: {{ .Values.reverseproxy.secretName }}
+                  key: {{ .Values.reverseproxy.keys.privateKey }}
           {{- with .Values.reverseproxy.resources }}
           resources:
             {{- toYaml . | nindent 12 }}

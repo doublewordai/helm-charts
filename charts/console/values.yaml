@@ -307,6 +307,10 @@ authentication:
 reverseproxy:
   enabled: true
   replicaCount: 1
+  secretName: "zeus-tls"
+  keys:
+    certificate: "certificate"
+    privateKey: "privatekey"
   image:
     repository: tytn/zeus-reverseproxy
     tag: ""
