@@ -44,16 +44,17 @@ In a production environment, these should be set.
 
 #### Create a configuration for the application
 
-In the Azure Portal, configure the Directory.   Choose 'Manage', 'App registrations', then 'New Registration':
+
+In the Azure Portal, configure the Directory.  Search for 'App registrations' and pick 'New registration'.
 
 | Field name              | Expected value                                             |
 | ----------------------- | ---------------------------------------------------------- |
-| Name                    | Doubleword Console                                         |
+| Name                    | Doubleword Console       (Arbitrary)                       |
 | Supported account types | Accounts in this organizational directory only             |
 | Redirect URI Platform   | Web                                                        |
-| Redirect URI            | <https://doubleword.yourdomain.example/authentication/auth>  |
-
-The Redirect URI does not have to be accessible to the Internet.
+| Redirect URI            | https://doubleword.yourdomain.example/authentication/auth  |
+                          
+The Redirect URI does not have to be accessible to the Internet. As an example, if using tailscale as an ingress, this would be something like "https://console-demo.tailxxxxx.ts.net/authentication/auth".
 
 #### Create a client secret
 
