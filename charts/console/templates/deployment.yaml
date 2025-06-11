@@ -364,12 +364,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
-                  key: certificate
+                  key: tlsCertificatePem
             - name: TLS_PRIVATE_KEY_PEM
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
-                  key: key
+                  key: tlsPrivateKeyPem
           {{- with .Values.reverseproxy.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
