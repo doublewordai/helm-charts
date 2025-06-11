@@ -223,19 +223,40 @@ spec:
               scheme: HTTP
           env:
             - name: PUBLIC_ACCESS
-              value: "{{ .Values.authentication.sso.publicAccess }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  key: publicAccess
             - name: FQDN
-              value: "{{ .Values.authentication.sso.fqdn }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  key: fqdn
             - name: PROVIDER
-              value: "{{ .Values.authentication.sso.provider }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  key: provider
             - name: CLIENT_ID
-              value: "{{ .Values.authentication.sso.clientId }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  key: clientId
             - name: CLIENT_SECRET
-              value: "{{ .Values.authentication.sso.clientSecret }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  key: clientSecret
             - name: AUTH_URL
-              value: "{{ .Values.authentication.sso.authUrl }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  key: authUrl
             - name: TOKEN_URL
-              value: "{{ .Values.authentication.sso.tokenUrl  }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  key: tokenUrl
           {{- with .Values.authentication.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
@@ -342,13 +363,13 @@ spec:
             - name: TLS_CERTIFICATE_PEM
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.reverseproxy.secretName }}
-                  key: {{ .Values.reverseproxy.keys.certificate }}
+                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  key: certificate
             - name: TLS_PRIVATE_KEY_PEM
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.reverseproxy.secretName }}
-                  key: {{ .Values.reverseproxy.keys.privateKey }}
+                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  key: key
           {{- with .Values.reverseproxy.resources }}
           resources:
             {{- toYaml . | nindent 12 }}

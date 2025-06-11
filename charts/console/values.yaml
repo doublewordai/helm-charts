@@ -285,7 +285,7 @@ db:
 secret:
   generate: true
   name: zeus-secret
-  # The keys in the secret in which each object is stored
+  # configurable keys in the secret in which each object is stored
   keys:
     dbUser: dbUser
     dbPassword: dbPassword
@@ -298,14 +298,6 @@ authentication:
     repository: tytn/zeus-authentication
     tag: ""
     pullPolicy: IfNotPresent
-  sso:
-    publicAccess: "true"
-    fqdn: "localhost"
-    provider: "azure"
-    clientId: "none"
-    clientSecret: "none"
-    authUrl: "none"
-    tokenUrl: "none"
   service:
     port: 9090
     annotations:
@@ -315,10 +307,6 @@ authentication:
 reverseproxy:
   enabled: true
   replicaCount: 1
-  secretName: "zeus-tls"
-  keys:
-    certificate: "certificate"
-    privateKey: "privatekey"
   image:
     repository: tytn/zeus-reverseproxy
     tag: ""
