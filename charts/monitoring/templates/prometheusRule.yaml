@@ -13,7 +13,7 @@ spec:
       rules:
         - alert: ConsumerGroupHttpErrorsDetected
           expr: |
-            sum by (namespace, service, path, consumer_group) (
+            sum by (namespace, service, path, consumer_group, pod) (
               increase(http_requests_total{status=~"4..|5..", path=~".*generate.*"}[5m])
             ) > 0
           for: 5m
