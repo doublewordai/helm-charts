@@ -22,6 +22,8 @@ serviceAccount:
 rbac:
   enabled: true
 
+skip_auth: false
+
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 # This makes use of path rewriting rules available in nginx - to use another
 # ingress type, either modify the annotations to give the same instruction to

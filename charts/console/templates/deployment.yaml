@@ -44,6 +44,8 @@ spec:
           imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           env:
             {{- include "console.zeusBackendEnv" . | nindent 12 }}
+            - name: ZEUS_SKIP_AUTH
+              value: {{ default false .Values.skip_auth | quote }}
           {{- with .Values.backend.ports }}
           ports:
             {{- toYaml . | nindent 12 }}
@@ -223,10 +225,7 @@ spec:
               scheme: HTTP
           env:
             - name: PUBLIC_ACCESS
-              valueFrom:
-                secretKeyRef:
-                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
-                  key: publicAccess
+              value: {{ default false .Values.skip_auth | quote }}
             - name: FQDN
               valueFrom:
                 secretKeyRef:
@@ -334,6 +333,8 @@ spec:
               port: https
               scheme: HTTPS
           env:
+            - name: SKIP_AUTH
+              value: {{ default false .Values.skip_auth | quote }}
             - name: APIKEYS_SERVICE
               value: {{ include "console.fullname" $ }}-apikeys
             - name: APIKEYS_PORT

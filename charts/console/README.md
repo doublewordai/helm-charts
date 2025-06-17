@@ -72,7 +72,6 @@ Click 'Add', then record the 'Value' and the 'Secret ID' to use later.
 Click 'Manage', 'App Registrations', 'Endpoints' and add the displayed information to the secret (i.e. along with dbUser):
 
 ```yaml
-publicAccess: false
 authUrl: 'OAuth 2.0 authorization endpoint (v2)' in the 'Endpoints'
 tokenUrl: 'OAuth 2.0 token endpoint (v2)' in the 'Endpoints'
 fqdn: Fully qualified hostname from the Redirect URI specified above (for example:  *doubleword.yourdomain.example*)
