@@ -84,13 +84,6 @@ Create a template for necessary environment variables for Zeus backend
 {{- $_ := set $templateEnv "ZEUS_DB_HOST" (dict "value" (printf "%s-db" (include "console.fullname" .))) }}
 {{- $_ := set $templateEnv "ZEUS_DB_PORT" (dict "value" "5432") }}
 {{- $_ := set $templateEnv "ZEUS_DB_NAME" (dict "value" "zeus") }}
-{{- if .Values.secret.generate }}
-    {{- $_ := set $templateEnv "ZEUS_DB_USER" (dict "valueFrom" (dict "secretKeyRef" (dict "name" (printf "%s-%s" (include "console.fullname" .) .Values.secret.name) "key" .Values.secret.keys.dbUser))) }}
-    {{- $_ := set $templateEnv "ZEUS_DB_PASSWORD" (dict "valueFrom" (dict "secretKeyRef" (dict "name" (printf "%s-%s" (include "console.fullname" .) .Values.secret.name) "key" .Values.secret.keys.dbPassword))) }}
-{{- else }}
-    {{- $_ := set $templateEnv "ZEUS_DB_USER" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.dbUser))) }}
-    {{- $_ := set $templateEnv "ZEUS_DB_PASSWORD" (dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.secret.name "key" .Values.secret.keys.dbPassword))) }}
-{{- end }}
 {{- $_ := set $templateEnv "ZEUS_INFERENCE_STACK_CR_NAME" (dict "value" ( include "console.inferenceStackCRName" $ )) }}
 {{- $_ := set $templateEnv "ZEUS_CLUSTER_NAMESPACE" (dict "value" .Release.Namespace) }}
 {{- $_ := set $templateEnv "ZEUS_ENABLE_NATS" (dict "value" "True") }}

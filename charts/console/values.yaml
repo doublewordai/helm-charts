@@ -23,6 +23,7 @@ rbac:
   enabled: true
 
 skip_auth: false
+secret_name: "console-secret"
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 # This makes use of path rewriting rules available in nginx - to use another
@@ -283,15 +284,6 @@ db:
     resources:
       requests:
         storage: 1Gi
-
-secret:
-  generate: true
-  name: zeus-secret
-  # configurable keys in the secret in which each object is stored
-  keys:
-    dbUser: dbUser
-    dbPassword: dbPassword
-
 
 authentication:
   enabled: true

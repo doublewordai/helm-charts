@@ -31,13 +31,13 @@ spec:
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
-              key: {{ .Values.secret.keys.dbUser }}
+              name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+              key: dbUser
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
-              key: {{ .Values.secret.keys.dbPassword }}
+              name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+              key: dbPassword
         - name: POSTGRES_DB
           value: zeus
         - name: PGDATA

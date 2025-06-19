@@ -46,6 +46,24 @@ spec:
             {{- include "console.zeusBackendEnv" . | nindent 12 }}
             - name: ZEUS_SKIP_AUTH
               value: {{ default false .Values.skip_auth | quote }}
+
+            - name: ZEUS_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  key: dbUser
+
+            - name: ZEUS_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  key: dbPassword
+
+            - name: ZEUS_DEFAULT_ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  key: defaultAdmin
           {{- with .Values.backend.ports }}
           ports:
             {{- toYaml . | nindent 12 }}
@@ -229,32 +247,32 @@ spec:
             - name: FQDN
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
                   key: fqdn
             - name: PROVIDER
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
                   key: provider
             - name: CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
                   key: clientId
             - name: CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
                   key: clientSecret
             - name: AUTH_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
                   key: authUrl
             - name: TOKEN_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.secret.generate }} {{ include "console.fullname" . }}-{{ .Values.secret.name }} {{ else }} {{ .Values.secret.name }} {{ end}}
+                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
                   key: tokenUrl
           {{- with .Values.authentication.resources }}
           resources:
