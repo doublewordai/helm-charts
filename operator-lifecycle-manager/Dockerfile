@@ -3,17 +3,25 @@
 # The raiser of the issue made a fork with this fixed: https://github.com/stackrox/helm-operator.
 FROM ubuntu as builder
 
-RUN apt-get update && apt-get install -y git build-essential wget
+RUN apt-get update && apt-get install -y git build-essential wget golang-go
 
-RUN wget https://go.dev/dl/go1.23.5.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.23.5.linux-amd64.tar.gz
-ENV PATH=$PATH:/usr/local/go/bin
+RUN go version
+
+ARG TARGETARCH
 
 RUN git clone https://github.com/stackrox/helm-operator.git helm-operator && \
     cd helm-operator && \
     make build && \
     make release && \
-    cp dist/helm-operator_linux_amd64_v1/helm-operator /helm-operator-2
+    if [ "$TARGETARCH" = "amd64" ]; then \
+        echo "Detected amd64" && \
+        cp dist/helm-operator_linux_amd64_v1/helm-operator /helm-operator-2; \
+    elif [ "$TARGETARCH" = "arm64" ]; then \
+        echo "Detected arm64" && \
+        cp dist/helm-operator_linux_arm64/helm-operator /helm-operator-2; \
+    else \
+        echo "Unsupported architecture: $TARGETARCH" && exit 1; \
+    fi
 
 # Build the manager binary
 FROM quay.io/operator-framework/helm-operator:v1.39.1
