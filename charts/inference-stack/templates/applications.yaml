@@ -11,6 +11,10 @@
   
   {{/* Merge application values into template */}}
   {{- $mergedValues = mustMergeOverwrite $mergedValues $baseValues }}
+
+  {{/* Decide which engine pattern this application uses */}}
+  {{- $engineType := default "takeoff" $mergedValues.engine }}
+  {{- $enginePort := int (default 3000 $mergedValues.readerConfig.enginePort) }}
   
   {{/* Handle modelsVolume - use application specific if provided, fall back to template, or use default if neither specified */}}
   {{- if not (empty $appModelsVolume) }}
@@ -130,15 +134,17 @@ spec:
           - mountPath: /models
             name: {{ $mergedValues.modelsVolume.name }}
       containers:
+{{- if eq $engineType "takeoff" }}
+        # ---------------- classic single-container path ----------------
         - name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}
           {{- with $mergedValues.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ $mergedValues.image.repository }}:{{ $mergedValues.image.tag | default (print $.Chart.AppVersion "-gpu") }}"
+          image: {{ $mergedValues.image.repository }}:{{ $mergedValues.image.tag }}
           imagePullPolicy: {{ $mergedValues.image.pullPolicy }}
           env:
-            {{ $applicationEnv | toYaml | nindent 12 }}
+            {{- $applicationEnv | toYaml | nindent 12 }}
           {{- with $mergedValues.ports }}
           ports:
             {{- toYaml . | nindent 12 }}
@@ -166,6 +172,74 @@ spec:
           {{- with $mergedValues.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+{{- else }}
+        # ---------------- two-container external-engine path ----------------
+
+        # Engine container ---------------------------------------------------
+        - name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}-engine
+          {{- with $mergedValues.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ $mergedValues.externalEngineImage.repository }}:{{ $mergedValues.externalEngineImage.tag }}
+          imagePullPolicy: {{ $mergedValues.externalEngineImage.pullPolicy }}
+          env:
+            {{- $applicationEnv | toYaml | nindent 12 }}
+            {{- with $enginePort }}
+            - name: ENGINE_PORT
+              value: "{{ . }}"
+            {{- end }}
+            {{- with $mergedValues.readerConfig.isEmbedding }}
+            - name: IS_EMBEDDING
+              value: "{{ . }}"
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ $enginePort }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          {{- with $mergedValues.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /sgl-workspace/config.yaml
+              subPath: config.yaml
+            - name: dshm
+              mountPath: /dev/shm
+            - name: {{ $mergedValues.modelsVolume.name }}
+              mountPath: /code/models
+          {{- with $mergedValues.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+        # Sidecar container --------------------------------------------------
+        - name: {{ include "inference-stack.fullname" $ }}-{{ $appName }}-sidecar
+          image: {{ $mergedValues.sidecarImage.repository }}:{{ $mergedValues.sidecarImage.tag }}
+          imagePullPolicy: {{ $mergedValues.sidecarImage.pullPolicy }}
+{{- if $mergedValues.sidecar.ports }}
+          ports:
+            {{- toYaml $mergedValues.sidecar.ports | nindent 12 }}
+{{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /code/config.yaml
+              subPath: config.yaml
+          env:
+            - name: TAKEOFF_SGLANG_API_URL
+              value: "http://localhost:{{ $enginePort }}"
+            - name: TAKEOFF_HEADLESS
+              value: "true"
+{{- range $kv := $mergedValues.sidecar.env }}
+            - {{- toYaml $kv | nindent 14 }}
+{{- end }}
+{{- with $mergedValues.sidecar.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+{{- end }}
+{{- end }}
       volumes:
         - name: config
           configMap:

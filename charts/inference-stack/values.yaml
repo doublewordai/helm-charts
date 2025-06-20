@@ -24,11 +24,11 @@ serviceAccount:
 gateway:
   # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
   image:
-    repository: tytn/takeoff-pro
+    repository: tytn/gateway
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    # These are hardcoded, and don't increase with the chart appVersion
+    tag: "0.0.1"
 
   config:
     internalPort: 3005
@@ -169,13 +169,38 @@ gateway:
 # The application template sets the base values for all the deployed applications.
 # An application is one or more replicas of a given model.
 applicationTemplate:
+  # legal values:  "takeoff" (default)  |  "external"
+  engine: takeoff
+
   # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
   image:
     repository: tytn/takeoff-pro
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    # This is the version number of the Takeoff Engine being deployed inside the inference stack. This version number should be
+    # incremented each time you wish to deploy a different version of Takeoff Engine as default.
+  # These are hardcoded, and don't increase with the chart appVersion
+    tag: "0.22.0-rc23-gpu"
+
+  # Only looked at when engine == external
+  # These are hardcoded, and don't increase with the chart appVersion
+  externalEngineImage:
+    repository: tytn/engine
+    pullPolicy: IfNotPresent
+    tag: "1.0.14-sglang"
+
+  # These are hardcoded, and don't increase with the chart appVersion
+  sidecarImage: 
+    repository: tytn/gateway
+    pullPolicy: IfNotPresent
+    tag: "0.0.1"
+
+  # Optional knobs that *only* affect the sidecar.
+  sidecar:
+    resources: {}
+    env: []
+    ports: []
+  
   # The config of the reader that will be deployed in this application.
   # Values are ones from the docs, with snake case replaced with camelcase
   env: []

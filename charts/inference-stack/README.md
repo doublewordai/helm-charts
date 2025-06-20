@@ -11,7 +11,7 @@ helm install inference-stack doublewordai/inference-stack
 
 ### Pulling Inference Stack images
 
-The Inference Stack image for the gateway and applications will be derived from the `appVersion` plus a '-cpu' and '-gpu' suffix respectively. You can override either of the tags by setting gateway/application.image.tag in your values override.
+The Inference Stack image for the gateway and is set in gateway/application.image.tag in your values override.
 
 Make sure you are authenticated to pull from the TitanML dockerhub, and have encoded this in a k8s Secret. You can then make this accessible to k8s in your values.yaml file, so it can pull the container images:
 

@@ -5,191 +5,191 @@ release:
 set:
   gateway.exportPrometheusMetrics: true
 templates:
-- templates/gateway.yaml
+  - templates/gateway.yaml
 tests:
-- it: should have a gateway label
-  asserts:
-  - equal:
-      path: metadata.labels['app.kubernetes.io/component']
-      value: gateway
+  - it: should have a gateway label
+    asserts:
+      - equal:
+          path: metadata.labels['app.kubernetes.io/component']
+          value: gateway
 
-- it: should have the same qualified names for everything
-  asserts:
-  - equal:
-      path: metadata.name
-      value: "test-release-inference-stack-gateway"
+  - it: should have the same qualified names for everything
+    asserts:
+      - equal:
+          path: metadata.name
+          value: "test-release-inference-stack-gateway"
 
-- it: should allow config overrides
-  set:
-    gateway.config.allowRemoteImages: true
-    gateway.config.allowSomethingArbitrary: "hello"
-  documentSelector:
-    path: kind
-    value: ConfigMap
-  asserts:
-  - equal:
-      path: data["config.yaml"]
-      value: |
-        takeoff:
-          server_config:
-            allow_remote_images: true
-            allow_something_arbitrary: hello
-            internal_port: 3005
-          readers_config:
+  - it: should allow config overrides
+    set:
+      gateway.config.allowRemoteImages: true
+      gateway.config.allowSomethingArbitrary: "hello"
+    documentSelector:
+      path: kind
+      value: ConfigMap
+    asserts:
+      - equal:
+          path: data["config.yaml"]
+          value: |
+            takeoff:
+              server_config:
+                allow_remote_images: true
+                allow_something_arbitrary: hello
+                internal_port: 3005
+              readers_config:
 
-- it: can set environment variables
-  set:
-    gateway.env:
-    - name: HELLO
-      value: "WORLD"
-  documentSelector:
-    path: kind
-    value: Deployment
-  asserts:
-  - contains:
-      path: spec.template.spec.containers[0].env
-      content: { name: "HELLO", value: "WORLD" }
-  - contains:
-      path: spec.template.spec.containers[0].env
-      content: { name: "TAKEOFF_ADD_READER_ID_SUFFIX", value: "true" }
+  - it: can set environment variables
+    set:
+      gateway.env:
+        - name: HELLO
+          value: "WORLD"
+    documentSelector:
+      path: kind
+      value: Deployment
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: { name: "HELLO", value: "WORLD" }
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: { name: "TAKEOFF_ADD_READER_ID_SUFFIX", value: "true" }
 
-- it: should set container image correctly
-  documentSelector:
-    path: kind
-    value: Deployment
-  asserts:
-  - equal:
-      path: spec.template.spec.containers[0].image
-      value: "tytn/takeoff-pro:0.22.0-rc23-cpu"
-  - equal:
-      path: spec.template.spec.containers[0].imagePullPolicy
-      value: "IfNotPresent"
+  - it: should set container image correctly
+    documentSelector:
+      path: kind
+      value: Deployment
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "tytn/gateway:0.0.1"
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: "IfNotPresent"
 
-- it: should set replica count correctly
-  set:
-    gateway.replicaCount: 3
-  documentSelector:
-    path: kind
-    value: Deployment
-  asserts:
-  - equal:
-      path: spec.replicas
-      value: 3
+  - it: should set replica count correctly
+    set:
+      gateway.replicaCount: 3
+    documentSelector:
+      path: kind
+      value: Deployment
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
 
-- it: should configure pod annotations when provided
-  set:
-    gateway.podAnnotations:
-      prometheus.io/scrape: "true"
-      prometheus.io/port: "3001"
-  documentSelector:
-    path: kind
-    value: Deployment
-  asserts:
-  - equal:
-      path: spec.template.metadata.annotations["prometheus.io/scrape"]
-      value: "true"
-  - equal:
-      path: spec.template.metadata.annotations["prometheus.io/port"]
-      value: "3001"
+  - it: should configure pod annotations when provided
+    set:
+      gateway.podAnnotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3001"
+    documentSelector:
+      path: kind
+      value: Deployment
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations["prometheus.io/scrape"]
+          value: "true"
+      - equal:
+          path: spec.template.metadata.annotations["prometheus.io/port"]
+          value: "3001"
 
-- it: should configure pod labels when provided
-  set:
-    gateway.podLabels:
-      environment: "test"
-      tier: "backend"
-  documentSelector:
-    path: kind
-    value: Deployment
-  asserts:
-  - equal:
-      path: spec.template.metadata.labels["environment"]
-      value: "test"
-  - equal:
-      path: spec.template.metadata.labels["tier"]
-      value: "backend"
+  - it: should configure pod labels when provided
+    set:
+      gateway.podLabels:
+        environment: "test"
+        tier: "backend"
+    documentSelector:
+      path: kind
+      value: Deployment
+    asserts:
+      - equal:
+          path: spec.template.metadata.labels["environment"]
+          value: "test"
+      - equal:
+          path: spec.template.metadata.labels["tier"]
+          value: "backend"
 
-- it: should configure pod security context when provided
-  set:
-    gateway.podSecurityContext:
-      fsGroup: 2000
-      runAsNonRoot: true
-  documentSelector:
-    path: kind
-    value: Deployment
-  asserts:
-  - equal:
-      path: spec.template.spec.securityContext.fsGroup
-      value: 2000
-  - equal:
-      path: spec.template.spec.securityContext.runAsNonRoot
-      value: true
+  - it: should configure pod security context when provided
+    set:
+      gateway.podSecurityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+    documentSelector:
+      path: kind
+      value: Deployment
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 2000
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
 
-- it: should expose gateway ports
-  documentSelector:
-    path: kind
-    value: Deployment
-  asserts:
-  - contains:
-      path: spec.template.spec.containers[0].ports
-      content:
-        containerPort: 3000
-        protocol: TCP
-        name: inference
-  - contains:
-      path: spec.template.spec.containers[0].ports
-      content:
-        containerPort: 3003
-        protocol: TCP
-        name: openai
-  - contains:
-      path: spec.template.spec.containers[0].ports
-      content:
-        containerPort: 3005
-        protocol: TCP
-        name: internal
+  - it: should expose gateway ports
+    documentSelector:
+      path: kind
+      value: Deployment
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            containerPort: 3000
+            protocol: TCP
+            name: inference
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            containerPort: 3003
+            protocol: TCP
+            name: openai
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            containerPort: 3005
+            protocol: TCP
+            name: internal
 
-- it: should create service with correct ports
-  documentSelector:
-    path: kind
-    value: Service
-  asserts:
-  - equal:
-      path: spec.type
-      value: ClusterIP
-  - contains:
-      path: spec.ports
-      content:
-        port: 80
-        targetPort: openai
-        protocol: TCP
-        name: http
-  - contains:
-      path: spec.ports
-      content:
-        port: 3001
-        protocol: TCP
-        name: management
-  - contains:
-      path: spec.ports
-      content:
-        port: 3000
-        protocol: TCP
-        name: inference
-  - contains:
-      path: spec.ports
-      content:
-        port: 3005
-        protocol: TCP
-        name: internal
+  - it: should create service with correct ports
+    documentSelector:
+      path: kind
+      value: Service
+    asserts:
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - contains:
+          path: spec.ports
+          content:
+            port: 80
+            targetPort: openai
+            protocol: TCP
+            name: http
+      - contains:
+          path: spec.ports
+          content:
+            port: 3001
+            protocol: TCP
+            name: management
+      - contains:
+          path: spec.ports
+          content:
+            port: 3000
+            protocol: TCP
+            name: inference
+      - contains:
+          path: spec.ports
+          content:
+            port: 3005
+            protocol: TCP
+            name: internal
 
-- it: should create ingress when enabled
-  set:
-    gateway.ingress.enabled: true
-    gateway.ingress.hosts[0].host: api.example.com
-  documentSelector:
-    path: kind
-    value: Ingress
-  asserts:
-  - equal:
-      path: spec.rules[0].host
-      value: api.example.com
+  - it: should create ingress when enabled
+    set:
+      gateway.ingress.enabled: true
+      gateway.ingress.hosts[0].host: api.example.com
+    documentSelector:
+      path: kind
+      value: Ingress
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: api.example.com
