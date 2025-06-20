@@ -176,7 +176,7 @@ volumeMounts:
   subPath: config_server.json
   readOnly: false
 - name: prompt-config
-  mountPath: /TakeoffRag/helios/components/nlp/prompt_config.json
+  mountPath: /TakeoffRag/helios/helios/components/nlp/prompt_config.json
   subPath: prompt_config.json
   readOnly: false
 
