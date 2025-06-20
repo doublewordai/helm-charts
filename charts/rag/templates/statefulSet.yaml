@@ -40,11 +40,11 @@ spec:
         - name: PGDATA
           value: /data/pgdata
         volumeMounts:
-        - name: postgres-data
+        - name: {{ include "rag.fullname" $ }}-postgres
           mountPath: /data
       {{- if .Values.dbExistingPvcName }}
       volumes:
-      - name: postgres-data
+      - name: {{ include "rag.fullname" $ }}-postgres
         persistentVolumeClaim:
           claimName: {{ .Values.dbExistingPvcName }}
       {{- end }}
