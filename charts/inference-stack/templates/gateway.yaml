@@ -59,7 +59,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag | default (print $.Chart.AppVersion "-cpu") }}"
+          image: "{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag }}"
           imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
           env:
             {{- include "inference-stack.gatewayEnv" . | nindent 12 }}
