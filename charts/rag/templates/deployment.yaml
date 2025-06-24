@@ -63,7 +63,7 @@ spec:
             {{- include "rag.BackendEnv" . | nindent 12 }}
           volumeMounts:
             - name: postgres-mongodb-feedback-exporter
-              mountPath: /TakeoffRag/export_feedback.py
+              mountPath: /TakeoffRag/helios/export_feedback.py
               subPath: export_feedback.py
         {{- end }}
       volumes:
