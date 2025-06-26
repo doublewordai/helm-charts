@@ -11,9 +11,10 @@ from loguru import logger
 host = os.getenv("INTERNAL_DATABASE_HOST", "localhost")
 port = os.getenv("INTERNAL_DATABASE_PORT", 5432)
 user = os.getenv("INTERNAL_DATABASE_USER", "postgres")
+db = os.getenv("INTERNAL_DATABASE_NAME", "titan-answers")
 password = os.getenv("INTERNAL_DATABASE_PASSWORD")
 
-POSTGRES_URL = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/titan-answers"
+POSTGRES_URL = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}"
 engine = create_engine(POSTGRES_URL)
 Session = sessionmaker(bind=engine)
 
