@@ -193,12 +193,6 @@ spec:
             - name: IS_EMBEDDING
               value: "{{ . }}"
             {{- end }}
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: {{ $enginePort }}
-            initialDelaySeconds: 30
-            periodSeconds: 10
           {{- with $mergedValues.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
