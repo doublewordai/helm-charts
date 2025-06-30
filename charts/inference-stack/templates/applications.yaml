@@ -157,6 +157,10 @@ spec:
           readinessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with $mergedValues.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with $mergedValues.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
@@ -193,6 +197,18 @@ spec:
             - name: IS_EMBEDDING
               value: "{{ . }}"
             {{- end }}
+          {{- with $mergedValues.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $mergedValues.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $mergedValues.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with $mergedValues.resources }}
           resources:
             {{- toYaml . | nindent 12 }}

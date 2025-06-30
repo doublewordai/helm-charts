@@ -278,6 +278,10 @@ applicationTemplate:
     # httpGet:
     #   path: /healthz
     #   port: inference
+  startupProbe:
+    # httpGet:
+    #   path: /healthz
+    #   port: inference
 
   # The volume to which the models for this container should be saved and loaded.
   # Supply a volume spec here. If supplying a persistentVolumeClaim, bear in mind
