@@ -6,7 +6,7 @@
 
 # IMPORTANT: Respect the semantic versioning rules (https://semver.org) when updating the VERSION. We use major channel subscriptions so any minor or patch updates will be automatically
 # upgraded by the OLM. Only major version updates will require manual intervention to upgrade.
-VERSION ?= 2.7.0
+VERSION ?= 2.8.0
 K8S_SAFE_VERSION := $(shell echo $(VERSION) | tr . -)
 CRD_VERSION ?= v1alpha1
 MAJOR_OPERATOR_VERSION ?= v$(shell echo $(VERSION) | cut -d. -f1)
@@ -210,7 +210,7 @@ bundle: sed yq kustomize operator-sdk sync-charts ## Generate bundle manifests a
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS)
 	$(OPERATOR_SDK) bundle validate ./bundle
 
-DOCKER ?= docker 
+DOCKER ?= docker
 
 .PHONY: bundle-build
 bundle-build: bundle ## Build then pushes the bundle and operator images.
