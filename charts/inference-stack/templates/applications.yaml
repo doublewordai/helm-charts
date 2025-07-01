@@ -215,7 +215,7 @@ spec:
           {{- end }}
           volumeMounts:
             - name: config
-              mountPath: /sgl-workspace/config.yaml
+              mountPath: /code/config.yaml
               subPath: config.yaml
             - name: dshm
               mountPath: /dev/shm
