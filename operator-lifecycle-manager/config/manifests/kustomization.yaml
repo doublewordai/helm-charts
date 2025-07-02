@@ -14,7 +14,7 @@ namespace: inference-stack-operator-system
 # "wordpress" becomes "alices-wordpress".
 # Note that it should also match with the prefix (text before '-') of the namespace
 # field above.
-nameSuffix: -2-9-0
+nameSuffix: -2-10-0
 
 # Labels to add to all resources and selectors.
 #labels:
