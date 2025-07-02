@@ -149,9 +149,16 @@ spec:
           ports:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $mergedValues.livenessProbe }}
+          {{- if $mergedValues.livenessProbe }}
           livenessProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml $mergedValues.livenessProbe | nindent 12 }}
+          {{- else }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 600
+            periodSeconds: 10
           {{- end }}
           {{- with $mergedValues.readinessProbe }}
           readinessProbe:
@@ -197,9 +204,16 @@ spec:
             - name: IS_EMBEDDING
               value: "{{ . }}"
             {{- end }}
-          {{- with $mergedValues.livenessProbe }}
+          {{- if $mergedValues.livenessProbe }}
           livenessProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml $mergedValues.livenessProbe | nindent 12 }}
+          {{- else }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ $enginePort }}
+            initialDelaySeconds: 600
+            periodSeconds: 10
           {{- end }}
           {{- with $mergedValues.readinessProbe }}
           readinessProbe:
