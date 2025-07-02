@@ -63,5 +63,8 @@ rules:
 - apiGroups: ["monitoring.coreos.com"]
   resources: ["servicemonitors"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["keda.sh"]
+  resources: ["scaledobjects"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 
-# +kubebuilder:scaffold:rules
+  # +kubebuilder:scaffold:rules
