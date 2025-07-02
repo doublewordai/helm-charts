@@ -210,12 +210,12 @@ bundle: sed yq kustomize operator-sdk sync-charts ## Generate bundle manifests a
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS)
 	$(OPERATOR_SDK) bundle validate ./bundle
 
-DOCKER ?= depot
+DOCKER ?= docker
 
 .PHONY: bundle-build
 bundle-build: bundle ## Build then pushes the bundle and operator images.
-	$(DOCKER) build -t $(CONTROLLER_IMAGE) . --platform $(IMAGE_PLATFORMS) --push
-	$(DOCKER) build -f bundle.Dockerfile -t $(BUNDLE_IMAGE) . --platform $(IMAGE_PLATFORMS) --push
+	$(DOCKER) build -t $(CONTROLLER_IMAGE) . --platform $(IMAGE_PLATFORMS)
+	$(DOCKER) build -f bundle.Dockerfile -t $(BUNDLE_IMAGE) . --platform $(IMAGE_PLATFORMS)
 
 .PHONY: bundle-push
 bundle-push: bundle-build
