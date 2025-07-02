@@ -1,8 +1,11 @@
 gpuOperator:
-  enabled: false
+  enabled: true
 
 argocd:
   enabled: true
 
 catalog:
   enabled: false
+
+skupper:
+  enabled: true

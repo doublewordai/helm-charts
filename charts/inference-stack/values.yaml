@@ -28,7 +28,7 @@ gateway:
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
     # These are hardcoded, and don't increase with the chart appVersion
-    tag: "0.1.0"
+    tag: "0.2.0"
 
   config:
     internalPort: 3005
