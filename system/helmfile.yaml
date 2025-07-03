@@ -19,6 +19,15 @@ releases:
   version: 2.15.1
   namespace: keda
 
+- name: olm
+  chart: ./charts/olm
+  installed: {{ .Values.olm.enabled }}
+  hooks:
+  - events: ["presync"]
+    showlogs: true
+    command: "bash"
+    args: ["-c", "curl -L -s https://github.com/operator-framework/operator-controller/releases/latest/download/install.sh | bash -s"]
+
 - name: monitoring
   chart: doublewordai/monitoring
   version: 1.0.0
@@ -34,11 +43,6 @@ releases:
   installed: {{ .Values.catalog.enabled }}
   version: 1.0.0
   namespace: inference-stack-operator-system
-  hooks:
-  - events: ["presync"]
-    showlogs: true
-    command: "bash"
-    args: ["-c", "curl -L -s https://github.com/operator-framework/operator-controller/releases/latest/download/install.sh | bash -s"]
 
 - name: argo-cd
   chart: argo-cd/argo-cd

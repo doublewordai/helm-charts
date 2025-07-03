@@ -9,3 +9,6 @@ catalog:
 
 skupper:
   enabled: true
+
+olm:
+  enabled: true
