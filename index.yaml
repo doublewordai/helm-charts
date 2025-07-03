@@ -113,6 +113,17 @@ entries:
     version: 0.1.0
   console:
   - apiVersion: v2
+    appVersion: 0.7.4
+    created: "2025-07-03T09:47:49.120555412Z"
+    description: A Helm chart to deploy the console which controls a Inference Stack.
+    digest: 78dfe2e82cc0c6f7ab14d87d60e71fe6632eaa44c7b45172f62666d1ddec1020
+    icon: https://raw.githubusercontent.com/titanml/titanml-public-assets/refs/heads/master/TitanML-Icon-1000x1001.png
+    name: console
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/console-2.5.0/console-2.5.0.tgz
+    version: 2.5.0
+  - apiVersion: v2
     appVersion: 0.7.3
     created: "2025-07-02T17:22:44.442237443Z"
     description: A Helm chart to deploy the console which controls a Inference Stack.
@@ -1413,4 +1424,4 @@ entries:
     urls:
     - https://github.com/titanml/helm-charts/releases/download/takeoff-system-0.1.0/takeoff-system-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-03T09:34:24.537914033Z"
+generated: "2025-07-03T09:47:49.120832022Z"
