@@ -28,7 +28,7 @@ gateway:
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
     # These are hardcoded, and don't increase with the chart appVersion
-    tag: "0.2.0"
+    tag: "0.3.0"
 
   config:
     internalPort: 3005
@@ -40,7 +40,7 @@ gateway:
     # bodySizeLimitBytes: 1024 * 1024 * 2, // The maximum body size
     # heartbeatCheckInterval: 1, // How frequently to check for dead readers. 0 means never
 
-  # Environment variables for the gateway
+    # Environment variables for the gateway
   env: []
   # - name: VARIABLE_NAME
   #   value: "variable_value"
@@ -59,12 +59,9 @@ gateway:
   # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   podLabels: {}
 
-  podSecurityContext:
-    {}
-    # fsGroup: 2000
+  podSecurityContext: {} # fsGroup: 2000
 
-  securityContext:
-    {}
+  securityContext: {}
     # capabilities:
     #   drop:
     #   - ALL
@@ -73,18 +70,18 @@ gateway:
     # runAsUser: 1000
 
   ports:
-    - containerPort: 3000
-      protocol: TCP
-      name: inference
-    - containerPort: 3001
-      protocol: TCP
-      name: management
-    - containerPort: 3003
-      protocol: TCP
-      name: openai
-    - containerPort: 3005
-      protocol: TCP
-      name: internal
+  - containerPort: 3000
+    protocol: TCP
+    name: inference
+  - containerPort: 3001
+    protocol: TCP
+    name: management
+  - containerPort: 3003
+    protocol: TCP
+    name: openai
+  - containerPort: 3005
+    protocol: TCP
+    name: internal
 
   # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
   service:
@@ -92,26 +89,25 @@ gateway:
     type: ClusterIP
     # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
     ports:
-      - port: 80
-        targetPort: openai
-        protocol: TCP
-        name: http
-      - port: 3001
-        protocol: TCP
-        name: management
-      - port: 3000
-        protocol: TCP
-        name: inference
-      - port: 3005
-        protocol: TCP
-        name: internal
+    - port: 80
+      targetPort: openai
+      protocol: TCP
+      name: http
+    - port: 3001
+      protocol: TCP
+      name: management
+    - port: 3000
+      protocol: TCP
+      name: inference
+    - port: 3005
+      protocol: TCP
+      name: internal
 
   # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
   ingress:
     enabled: false
     className: ""
-    annotations:
-      {}
+    annotations: {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     hosts: []
@@ -120,8 +116,7 @@ gateway:
     #    hosts:
     #      - chart-example.local
 
-  resources:
-    {}
+  resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -134,13 +129,11 @@ gateway:
     #   memory: 128Mi
 
   # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  livenessProbe:
-    {}
+  livenessProbe: {}
     # httpGet:
     #   path: /healthz
     #   port: inference
-  readinessProbe:
-    {}
+  readinessProbe: {}
     # httpGet:
     #   path: /healthz
     #   port: inference
@@ -179,7 +172,7 @@ applicationTemplate:
     pullPolicy: IfNotPresent
     # This is the version number of the Takeoff Engine being deployed inside the inference stack. This version number should be
     # incremented each time you wish to deploy a different version of Takeoff Engine as default.
-  # These are hardcoded, and don't increase with the chart appVersion
+    # These are hardcoded, and don't increase with the chart appVersion
     tag: "0.22.0-rc23-gpu"
 
   # Only looked at when engine == external
@@ -190,7 +183,7 @@ applicationTemplate:
     tag: "1.0.14-sglang"
 
   # These are hardcoded, and don't increase with the chart appVersion
-  sidecarImage: 
+  sidecarImage:
     repository: tytn/gateway
     pullPolicy: IfNotPresent
     tag: "0.0.9-py"
@@ -200,7 +193,7 @@ applicationTemplate:
     resources: {}
     env: []
     ports: []
-  
+
   # The config of the reader that will be deployed in this application.
   # Values are ones from the docs, with snake case replaced with camelcase
   env: []
@@ -230,7 +223,7 @@ applicationTemplate:
     # loras: Option<String>, # The loras to load on this reader.
     # enableDocumentProcessing: Option<bool>, # Whether to configure this reader for document processing.
 
-  # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+    # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
   replicaCount: 1
 
   # This is for setting Kubernetes Annotations to a Pod.
@@ -240,12 +233,9 @@ applicationTemplate:
   # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   podLabels: {}
 
-  podSecurityContext:
-    {}
-    # fsGroup: 2000
+  podSecurityContext: {} # fsGroup: 2000
 
-  securityContext:
-    {}
+  securityContext: {}
     # capabilities:
     #   drop:
     #   - ALL
@@ -253,8 +243,7 @@ applicationTemplate:
     # runAsNonRoot: true
     # runAsUser: 1000
 
-  resources:
-    {}
+  resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -327,8 +316,8 @@ applicationTemplate:
       # for more information, and configure the `horizontalPodAutoscalerConfig`
       # section below to change the behaviour
       value: 10
-    annotations:
-    # scaledobject.keda.sh/transfer-hpa-ownership: "true"     # Optional. Use to transfer an existing HPA ownership to this ScaledObject
+    annotations: # scaledobject.keda.sh/transfer-hpa-ownership: "true"     # Optional. Use to transfer an existing HPA ownership to this ScaledObject
+
     # validations.keda.sh/hpa-ownership: "true"               # Optional. Use to disable HPA ownership validation on this ScaledObject
     # autoscaling.keda.sh/paused: "true"                      # Optional. Use to pause autoscaling of objects explicitly
     spec:
@@ -341,8 +330,8 @@ applicationTemplate:
       # fallback:                                                 # Optional. Section to specify fallback options if the scaler fails.
       #   failureThreshold: 3                                     # Mandatory if fallback section is included
       #   replicas: 6                                             # Mandatory if fallback section is included
-      advanced:
-        {} # Optional. Section to specify advanced options
+      advanced: {}
+        # Optional. Section to specify advanced options
         # restoreToOriginalReplicaCount: false # configure the behaviour if this scaledObject gets deleted.
         # horizontalPodAutoscalerConfig: # Optional. Section to specify HPA related options
         #   behavior: # Use to modify HPA's scaling behavior
@@ -360,8 +349,7 @@ applicationTemplate:
         #           periodSeconds: 300
 
 # Use this section to deploy your applications
-applications:
-  {}
+applications: {}
   # Note; application names have to be url safe!
   # dummy:
   #   resources:
