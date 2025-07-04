@@ -335,6 +335,17 @@ entries:
   inference-stack:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2025-07-04T17:21:15.964652845Z"
+    description: A Helm chart for deploying a inference stack in kubernetes
+    digest: 2ebc749c06f95285000fe2b7a5ee475d68bc1d347d8bb5f3667c56f5b1a2a276
+    icon: https://raw.githubusercontent.com/titanml/titanml-public-assets/refs/heads/master/TitanML-Icon-1000x1001.png
+    name: inference-stack
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/inference-stack-1.8.1/inference-stack-1.8.1.tgz
+    version: 1.8.1
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2025-07-04T16:04:55.870455721Z"
     description: A Helm chart for deploying a inference stack in kubernetes
     digest: 93527873b84e5acaf10259486686f491058d4373e8f1c8090eda57265a0cd7ac
@@ -1490,4 +1501,4 @@ entries:
     urls:
     - https://github.com/titanml/helm-charts/releases/download/takeoff-system-0.1.0/takeoff-system-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-04T16:21:05.767837703Z"
+generated: "2025-07-04T17:21:15.96489156Z"
