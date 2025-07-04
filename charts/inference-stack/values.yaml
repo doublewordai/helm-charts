@@ -28,7 +28,7 @@ gateway:
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
     # These are hardcoded, and don't increase with the chart appVersion
-    tag: "0.3.0"
+    tag: "0.3.1"
 
   config:
     internalPort: 3005
@@ -185,7 +185,7 @@ applicationTemplate:
   sidecarImage:
     repository: tytn/gateway
     pullPolicy: IfNotPresent
-    tag: "0.3.0-py"
+    tag: "0.3.1-py"
 
   # Optional knobs that *only* affect the sidecar.
   sidecar:

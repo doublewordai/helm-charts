@@ -11,7 +11,7 @@ Stable:
   - Image: docker.io/tytn/operator-bundle:2.0.0
   - Image: docker.io/tytn/operator-bundle:2.2.0
   - Image: docker.io/tytn/operator-bundle:2.10.0
-  - Image: docker.io/tytn/operator-bundle:2.11.0
+  - Image: docker.io/tytn/operator-bundle:2.12.0
 # This is the channel that developers will subscribe to. This channel will have the latest bundles that are not production ready.
 # This channel will be updated frequently and may contain breaking changes.
 Fast:
@@ -31,3 +31,4 @@ Fast:
   - Image: docker.io/tytn/operator-bundle:2.9.0
   - Image: docker.io/tytn/operator-bundle:2.10.0
   - Image: docker.io/tytn/operator-bundle:2.11.0
+  - Image: docker.io/tytn/operator-bundle:2.12.0
