@@ -3,6 +3,17 @@ entries:
   catalog:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2025-07-04T16:04:55.736203026Z"
+    description: A Helm chart for a Cluster Catalog and Cluster Extensions.
+    digest: b53368af51402fbae732b8c9b6ad6c4433184e243a222634487797415c320a85
+    icon: https://raw.githubusercontent.com/titanml/titanml-public-assets/refs/heads/master/TitanML-Icon-1000x1001.png
+    name: catalog
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/catalog-1.9.0/catalog-1.9.0.tgz
+    version: 1.9.0
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2025-07-02T17:16:24.991549832Z"
     description: A Helm chart for a Cluster Catalog and Cluster Extensions.
     digest: 06a562275e468b32b71831039c8c2f541d212387c7a24841c6c8a87f2e010fa1
@@ -311,6 +322,17 @@ entries:
     - https://github.com/titanml/helm-charts/releases/download/console-0.3.0/console-0.3.0.tgz
     version: 0.3.0
   inference-stack:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-07-04T16:04:55.870455721Z"
+    description: A Helm chart for deploying a inference stack in kubernetes
+    digest: 93527873b84e5acaf10259486686f491058d4373e8f1c8090eda57265a0cd7ac
+    icon: https://raw.githubusercontent.com/titanml/titanml-public-assets/refs/heads/master/TitanML-Icon-1000x1001.png
+    name: inference-stack
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/inference-stack-1.8.0/inference-stack-1.8.0.tgz
+    version: 1.8.0
   - apiVersion: v2
     appVersion: 1.0.0
     created: "2025-07-02T17:06:22.566902215Z"
@@ -1457,4 +1479,4 @@ entries:
     urls:
     - https://github.com/titanml/helm-charts/releases/download/takeoff-system-0.1.0/takeoff-system-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-04T10:55:09.418652568Z"
+generated: "2025-07-04T16:04:55.870726823Z"
