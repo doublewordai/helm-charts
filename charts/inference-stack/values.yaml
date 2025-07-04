@@ -82,7 +82,6 @@ gateway:
   - containerPort: 3005
     protocol: TCP
     name: internal
-
   # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
   service:
     # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
@@ -186,7 +185,7 @@ applicationTemplate:
   sidecarImage:
     repository: tytn/gateway
     pullPolicy: IfNotPresent
-    tag: "0.0.9-py"
+    tag: "0.3.0-py"
 
   # Optional knobs that *only* affect the sidecar.
   sidecar:
