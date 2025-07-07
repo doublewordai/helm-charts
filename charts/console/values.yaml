@@ -22,8 +22,8 @@ serviceAccount:
 rbac:
   enabled: true
 
-skip_auth: false
-secret_name: "console-secret"
+skipAuth: false
+secretName: "console-secret"
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 # This makes use of path rewriting rules available in nginx - to use another

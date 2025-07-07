@@ -45,24 +45,24 @@ spec:
           env:
             {{- include "console.zeusBackendEnv" . | nindent 12 }}
             - name: ZEUS_SKIP_AUTH
-              value: {{ default false .Values.skip_auth | quote }}
+              value: {{ default false .Values.skipAuth | quote }}
 
             - name: ZEUS_DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
                   key: dbUser
 
             - name: ZEUS_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
                   key: dbPassword
 
             - name: ZEUS_DEFAULT_ADMIN_EMAIL
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
                   key: defaultAdmin
           {{- with .Values.backend.ports }}
           ports:
@@ -243,36 +243,36 @@ spec:
               scheme: HTTP
           env:
             - name: PUBLIC_ACCESS
-              value: {{ default false .Values.skip_auth | quote }}
+              value: {{ default false .Values.skipAuth | quote }}
             - name: FQDN
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
                   key: fqdn
             - name: PROVIDER
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
                   key: provider
             - name: CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
                   key: clientId
             - name: CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
                   key: clientSecret
             - name: AUTH_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
                   key: authUrl
             - name: TOKEN_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+                  name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
                   key: tokenUrl
           {{- with .Values.authentication.resources }}
           resources:
@@ -352,7 +352,7 @@ spec:
               scheme: HTTPS
           env:
             - name: SKIP_AUTH
-              value: {{ default false .Values.skip_auth | quote }}
+              value: {{ default false .Values.skipAuth | quote }}
             - name: APIKEYS_SERVICE
               value: {{ include "console.fullname" $ }}-apikeys
             - name: APIKEYS_PORT

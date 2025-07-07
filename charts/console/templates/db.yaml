@@ -31,12 +31,12 @@ spec:
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+              name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
               key: dbUser
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ if .Values.skip_auth }} {{ include "console.fullname" . }}-{{ .Values.secret_name }} {{ else }} {{ .Values.secret_name }} {{ end}}
+              name: {{ if .Values.skipAuth }} {{ include "console.fullname" . }}-{{ .Values.secretName }} {{ else }} {{ .Values.secretName }} {{ end}}
               key: dbPassword
         - name: POSTGRES_DB
           value: zeus

@@ -60,7 +60,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: "tytn/gateway:0.2.0"
+          value: "tytn/gateway:0.3.1"
       - equal:
           path: spec.template.spec.containers[0].imagePullPolicy
           value: "IfNotPresent"

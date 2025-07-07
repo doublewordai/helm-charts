@@ -29,9 +29,9 @@ helm install console doublewordai/console --set imagePullSecrets[0].name=<SECRET
 ## Architecture overview
 
 This chart deploys the management console as two Kubernetes [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) (one for the frontend, one for the backend), a [postgres](https://www.postgresql.org/) database, and a [`InferenceStack` custom resource](https://github.com/doublewordai/helm-charts/charts/inference-stack) which is managed by the [Inference Stack Operator](./../../operator-lifecycle-manager/README.md).
-You'll need to provide values for the username and password, unless you're using `skip_auth: true`, which will generate them for you.
+You'll need to provide values for the username and password, unless you're using `skipAuth: true`, which will generate them for you.
 
-Create this secret in the target namespace, and put its name as the top-level value secret_name. You'll need to put SSO information in this same secret (see below).
+Create this secret in the target namespace, and put its name as the top-level value secretName. You'll need to put SSO information in this same secret (see below).
 
 ## Resource requests & limits
 
