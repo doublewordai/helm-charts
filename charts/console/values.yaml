@@ -33,11 +33,17 @@ ingress:
   enabled: false
   className: ""
   annotations: {}
-  hosts:
-    - host: example.com
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
+  rules: []
+    # - host: example.com
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: ImplementationSpecific
+    #         backend:
+    #           service:
+    #             name: console-reverseproxy
+    #             port:
+    #               number: 80
   tls: []
   # - secretName: tls-secret
   #   hosts:
@@ -315,6 +321,9 @@ reverseproxy:
     ports:
       - port: 443
         targetPort: 443
+        protocol: TCP
+      - port: 80
+        targetPort: 80
         protocol: TCP
   resources: {}
   nodeSelector: {}
