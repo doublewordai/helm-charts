@@ -13,7 +13,7 @@ spec:
   ports:
     {{- range $port := .Values.ports }}
     - port: {{ $port.containerPort }}
-      targetPort: http
+      targetPort: {{ $port.name }}
       protocol: {{ $port.protocol }}
       name: {{ $port.name }}
     {{- end }}

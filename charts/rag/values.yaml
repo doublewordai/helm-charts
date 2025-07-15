@@ -42,7 +42,7 @@ securityContext:
   # runAsUser: 1000
 
 ports:
-  - name: api
+  - name: http
     containerPort: 8000
     protocol: TCP
 
@@ -67,7 +67,7 @@ additionalServices: []
   #       - port: 8000
   #         targetPort: 8000
   #         protocol: TCP
-  #         name: api
+  #         name: http
   #     selector:
   #       app.kubernetes.io/component: rag
 
