@@ -13,3 +13,24 @@ spec:
     {{- toYaml .Values.service.ports | nindent 4 }}
   type: {{ .Values.service.type }}
 {{- end }}
+{{- $ns := .Release.Namespace }}
+{{- range $service := .Values.additionalServices }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $service.name }}
+  namespace: {{ $ns }}
+  labels:
+    {{- include "onwards.labels" $ | nindent 4 }}
+  {{- with $service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    {{- include "onwards.selectorLabels" $ | nindent 4 }}
+  ports:
+    {{- toYaml $service.ports | nindent 4 }}
+  type: {{ $service.type }}
+{{- end }}

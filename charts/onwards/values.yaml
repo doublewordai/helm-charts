@@ -78,6 +78,9 @@ service:
       port: 80
       targetPort: 3000
 
+# Extra services to be deployed alongside the main deployment, for instance application load balancers
+additionalServices: []
+
 # This is for setting up the ingress resource more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: false
