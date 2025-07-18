@@ -549,7 +549,30 @@ entries:
     urls:
     - https://github.com/titanml/helm-charts/releases/download/monitoring-0.1.0/monitoring-0.1.0.tgz
     version: 0.1.0
+  onwards:
+  - apiVersion: v2
+    appVersion: v0.2.0
+    created: "2025-07-18T12:31:53.17033415Z"
+    description: Onwards Helm Chart
+    digest: 44217ebe3770849a6cc4743514fb008d6c0d3d27039d1cf6520120ffb358cf45
+    name: onwards
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/onwards-0.1.0/onwards-0.1.0.tgz
+    version: 0.1.0
   rag:
+  - apiVersion: v2
+    appVersion: 0.20.14
+    created: "2025-07-18T12:31:53.392857972Z"
+    description: A Helm chart for deploying the RAG (Retrieval-Augmented Generation)
+      application.
+    digest: cd7aa6c785cda0f3dbc9130f99ce7f04d5e468d85bd3969145b129f58d523ea9
+    icon: https://raw.githubusercontent.com/titanml/titanml-public-assets/refs/heads/master/TitanML-Icon-1000x1001.png
+    name: rag
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/rag-1.8.0/rag-1.8.0.tgz
+    version: 1.8.0
   - apiVersion: v2
     appVersion: 0.20.14
     created: "2025-07-15T12:06:13.080777395Z"
@@ -1591,4 +1614,4 @@ entries:
     urls:
     - https://github.com/titanml/helm-charts/releases/download/takeoff-system-0.1.0/takeoff-system-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-15T12:06:13.081067782Z"
+generated: "2025-07-18T12:31:53.393093986Z"
