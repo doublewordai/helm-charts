@@ -22,12 +22,17 @@ jobs:
         with:
           version: "latest"
 
-      - name: Run Helm lint for inference-stack
-        working-directory: ./charts/inference-stack
+      - name: Run Helm lint for rag
+        working-directory: ./charts/rag
         run: |
           helm lint .
 
       - name: Run Helm lint for console
         working-directory: ./charts/console
+        run: |
+          helm lint .
+
+      - name: Run Helm lint for onwards
+        working-directory: ./charts/onwards
         run: |
           helm lint .
