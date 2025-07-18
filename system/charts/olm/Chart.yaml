@@ -1,4 +1,0 @@
-apiVersion: v2
-name: olm
-version: 0.1.0
-description: Empty chart for hooks only
