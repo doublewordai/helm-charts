@@ -35,7 +35,6 @@ helm.sh/chart: {{ include "onwards.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-app.kubernetes.io/component: gateway
 app.kubernetes.io/name: {{ include "onwards.name" . }}
 {{- end }}
 
@@ -45,5 +44,4 @@ Selector labels
 {{- define "onwards.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "onwards.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: gateway
 {{- end }}
