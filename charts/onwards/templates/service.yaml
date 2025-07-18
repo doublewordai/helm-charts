@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "onwards.fullname" . }}
+  name: {{ include "onwards.fullname" . }}-service
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "onwards.labels" . | nindent 4 }}
