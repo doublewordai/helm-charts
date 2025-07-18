@@ -23,9 +23,9 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: takeoff-pro-config
+  name: {{ .Values.dpp.name }}
   labels:
-    app: takeoff-pro
+    app: {{ .Values.dpp.name }}
 data:
   config.yaml: |
     takeoff:
