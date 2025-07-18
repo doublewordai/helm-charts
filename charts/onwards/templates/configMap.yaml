@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "onwards.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+data:
+  config.json: |
+    {
+      {{- if .Values.auth.enabled }}
+      "auth": {
+        "global_keys": {{ .Values.auth.globalKeys }}
+      },
+      {{- end }}
+      "targets": {
+        {{- $first := true }}
+        {{- range $name, $config := .Values.targets }}
+        {{- if $config.enabled }}
+        {{- if not $first }},{{ end }}
+        "{{ $name }}": {
+          "url": "{{ $config.url }}",
+          "onwards_model": "{{ $config.model }}"
+        }
+        {{- $first = false }}
+        {{- end }}
+        {{- end }}
+      }
+    }
+---

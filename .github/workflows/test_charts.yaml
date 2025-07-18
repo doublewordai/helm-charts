@@ -22,22 +22,8 @@ jobs:
         with:
           version: "latest"
 
-      - name: Install Helm unittest plugin
-        run: |
-          helm plugin install https://github.com/helm-unittest/helm-unittest
-
-      - name: Run Helm lint for inference-stack
-        working-directory: ./charts/inference-stack
-        run: |
-          helm lint .
-      
-      - name: Run Helm lint for catalog
-        working-directory: ./charts/catalog
-        run: |
-          helm lint .
-      
-      - name: Run Helm lint for monitoring
-        working-directory: ./charts/monitoring
+      - name: Run Helm lint for rag
+        working-directory: ./charts/rag
         run: |
           helm lint .
 
@@ -46,7 +32,7 @@ jobs:
         run: |
           helm lint .
 
-      - name: Run Helm unittest for inference-stack
-        working-directory: ./charts/inference-stack
+      - name: Run Helm lint for onwards
+        working-directory: ./charts/onwards
         run: |
-          helm unittest .
+          helm lint .

@@ -94,3 +94,60 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+---
+{{- if .Values.dpp.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.dpp.name }}
+  labels:
+    app: {{ .Values.dpp.name }}
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.dpp.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.dpp.name }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: takeoff-pro
+          image:  "{{ .Values.dpp.image.repository }}:{{ .Values.dpp.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.dpp.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          {{- with .Values.dpp.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dpp.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dpp.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dpp.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /code/config.yaml
+              subPath: config.yaml
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ .Values.dpp.name }}
+{{- end }}

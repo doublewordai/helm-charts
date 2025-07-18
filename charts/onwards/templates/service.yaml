@@ -1,0 +1,15 @@
+{{- if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "onwards.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "onwards.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "onwards.selectorLabels" . | nindent 4 }}
+  ports:
+    {{- toYaml .Values.service.ports | nindent 4 }}
+  type: {{ .Values.service.type }}
+{{- end }}
