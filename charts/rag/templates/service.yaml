@@ -47,3 +47,20 @@ spec:
   {{- toYaml $loadBalancer.spec | nindent 2 }}
 ---
 {{- end }}
+{{- if .Values.dpp.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.dpp.name }}-service
+  labels:
+    app: {{ .Values.dpp.name }}
+    alert_uptime: "true"
+spec:
+  selector:
+    app: {{ .Values.dpp.name }}
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+  type: ClusterIP
+{{- end }}

@@ -19,3 +19,21 @@ data:
 {{ .Files.Get "export_feedback.py" | indent 4 }}
 ---
 {{- end }}
+{{- if .Values.dpp.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: takeoff-pro-config
+  labels:
+    app: takeoff-pro
+data:
+  config.yaml: |
+    takeoff:
+      server_config:
+        internal_port: 3005
+      readers_config:
+        document_processor:
+          model_name: TitanML/document_processor
+          device: cpu
+          consumer_group: primary
+{{- end }}
