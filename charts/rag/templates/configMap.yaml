@@ -35,5 +35,5 @@ data:
         document_processor:
           model_name: TitanML/document_processor
           device: cpu
-          consumer_group: primary
+          consumer_group: document_processor
 {{- end }}
