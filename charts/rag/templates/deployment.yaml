@@ -146,6 +146,18 @@ spec:
               mountPath: /code/config.yaml
               subPath: config.yaml
               readOnly: true
+      {{- with .Values.dpp.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dpp.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dpp.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         - name: config-volume
           configMap:
