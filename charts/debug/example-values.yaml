@@ -1,0 +1,42 @@
+# Example values for deploying the debug chart with SSH tunnel
+# Copy this file and modify the values for your environment
+
+# SSH configuration for reverse tunnel to bastion host
+ssh:
+  bastionHost: "your-bastion-server.example.com"
+  bastionUser: "your-username"
+  bastionPort: 22
+  localPort: 2222
+  remotePort: 22
+  privateKeySecret: "debug-ssh-key"
+  sshOptions: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=30 -o ServerAliveCountMax=3"
+
+# Pod configuration
+replicaCount: 1
+
+image:
+  repository: ubuntu
+  tag: "22.04"
+  pullPolicy: IfNotPresent
+
+# Debug pod specific settings
+debug:
+  sleepInfinity: true
+  installTools: true
+
+# Resource limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# RBAC settings
+rbac:
+  create: true
+  rules:
+    - apiGroups: ["*"]
+      resources: ["*"]
+      verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]

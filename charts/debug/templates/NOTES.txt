@@ -1,0 +1,39 @@
+Debug Pod Deployment Complete!
+
+The debug pod has been deployed with the following capabilities:
+- Reverse SSH tunnel to bastion host (if configured)
+- Full cluster access via RBAC
+- Pre-installed debugging tools (kubectl, helm, curl, wget, jq)
+
+To connect to your debug pod:
+
+1. Exec into the pod:
+   kubectl exec -it -n {{ .Release.Namespace }} deployment/{{ include "debug.fullname" . }} -- /bin/bash
+
+2. Check pod status:
+   kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "debug.name" . }}
+
+{{- if .Values.ssh.bastionHost }}
+3. SSH tunnel status:
+   The pod is configured to create a reverse SSH tunnel to {{ .Values.ssh.bastionHost }}:{{ .Values.ssh.bastionPort }}
+   From your bastion host, you can connect back to the pod via: ssh root@localhost -p {{ .Values.ssh.remotePort }}
+   Default password: debug123
+{{- else }}
+3. SSH Configuration:
+   To enable reverse SSH tunneling, update the values:
+   - ssh.bastionHost: your-bastion-server.com
+   - ssh.bastionUser: your-username
+   - ssh.bastionPort: 22 (or your SSH port)
+   
+   And create the SSH key secret:
+   kubectl create secret generic debug-ssh-key --from-file=ssh-privatekey=/path/to/your/private/key -n {{ .Release.Namespace }}
+{{- end }}
+
+4. Available tools in the pod:
+   - kubectl (for Kubernetes operations)
+   - helm (for Helm operations)
+   - curl, wget (for HTTP requests)
+   - jq (for JSON processing)
+   - openssh-client/server (for SSH operations)
+
+Security Note: This pod runs with elevated privileges and cluster-wide access. Use only in development/testing environments.

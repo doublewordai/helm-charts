@@ -6,12 +6,9 @@ The DoubleWord Inference Platform provides helm charts allow you to deploy open 
 
 ```bash
 charts/
-├── catalog/                    # Cluster Catalog, `InferenceStack` Custom Resource Definition (CRD) and Cluster Extensions.
-├── console/                    # Console UI, an empty `InferenceStack` Custom Resource which the UI can manipulate.
-├── inference-stack/            # Gateway, and numerous Readers.
-└── monitoring/                 # Custom configuration of the kube-prometheus-stack helm chart provided by the Prometheus Community.
-system/                         # Step-by-step guide to install all the cluster wide dependencies needed to run the inference-stack or console charts.
-operator-lifecycle-manager/     # Resources to build Inference Stack Operator Lifecycle Manager.
+├── onwards/                    # a rust based AI Gateway that provides a unified interface for routing requests to openAI compatible targets.
+├── rag/                        # a helm chart that deploys the RAG stack
+└── console/                    # Console UI, an empty `InferenceStack` Custom Resource which the UI can manipulate.
 ```
 
 ## Architecture
@@ -62,4 +59,3 @@ The Controller in this context is a sub-component of the Operator that watches t
 * Consumer Group: the group of collective Readers that pull from a single queue. Note, Readers can belong to more than one consumer group, so there is a many-to-many mapping between Readers and Queues.
 
 ....
-
