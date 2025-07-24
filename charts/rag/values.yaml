@@ -211,3 +211,50 @@ dpp:
   resources: {}
   livenessProbe: {}
   readinessProbe: {}
+  tolerations:
+    # GKE (Google Kubernetes Engine)
+    - key: nvidia.com/gpu
+      operator: Equal
+      value: present
+      effect: NoSchedule
+    # EKS (Amazon Elastic Kubernetes Service) - if configured
+    - key: nvidia.com/gpu
+      operator: Exists
+      effect: NoSchedule
+    # AKS (Azure Kubernetes Service)
+    - key: sku
+      operator: Equal
+      value: gpu
+      effect: NoSchedule
+    # Generic/Custom Kubernetes
+    - key: dedicated
+      operator: Equal
+      value: gpu
+      effect: NoSchedule
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        # GKE (Google Kubernetes Engine)
+        - matchExpressions:
+          - key: nvidia.com/gpu.present
+            operator: In
+            values: ["true"]
+        # EKS (Amazon Elastic Kubernetes Service)
+        - matchExpressions:
+          - key: k8s.amazonaws.com/accelerator
+            operator: Exists
+        # AKS (Azure Kubernetes Service)
+        - matchExpressions:
+          - key: accelerator
+            operator: In
+            values: ["nvidia", "gpu"]
+        # Generic Kubernetes (common custom label)
+        - matchExpressions:
+          - key: node.kubernetes.io/gpu
+            operator: Exists
+        # On-premise/Custom Kubernetes
+        - matchExpressions:
+          - key: hardware-type
+            operator: In
+            values: ["gpu", "nvidia-gpu"]
