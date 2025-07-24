@@ -1,0 +1,149 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "debug.fullname" . }}
+  labels:
+    {{- include "debug.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "debug.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "debug.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "debug.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              
+              # Update package list and install required packages
+              apt-get update
+              apt-get install -y openssh-client curl wget jq
+              
+              {{- if .Values.debug.installTools }}
+              # Install kubectl
+              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+              chmod +x kubectl
+              mv kubectl /usr/local/bin/
+              
+              # Install helm
+              curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+              chmod 700 get_helm.sh
+              ./get_helm.sh
+              {{- end }}
+              
+              # Setup SSH directory
+              mkdir -p /root/.ssh
+              chmod 700 /root/.ssh
+              
+              # Copy SSH private key from secret if available
+              if [ -f /etc/ssh-key/ssh-privatekey ]; then
+                cp /etc/ssh-key/ssh-privatekey /root/.ssh/id_rsa
+                chmod 600 /root/.ssh/id_rsa
+              fi
+              
+              # Start SSH reverse tunnel if bastion host is configured
+              {{- if .Values.ssh.bastionHost }}
+              echo "Starting SSH reverse tunnel to {{ .Values.ssh.bastionHost }}..."
+              ssh {{ .Values.ssh.sshOptions }} \
+                -N \
+                -R {{ .Values.ssh.remotePort }}:localhost:{{ .Values.ssh.localPort }} \
+                {{ .Values.ssh.bastionUser }}@{{ .Values.ssh.bastionHost }} \
+                -p {{ .Values.ssh.bastionPort }} &
+              
+              SSH_PID=$!
+              echo "SSH tunnel started with PID: $SSH_PID"
+              {{- end }}
+              
+              # Start SSH server for incoming connections
+              apt-get install -y openssh-server
+              mkdir -p /var/run/sshd
+              echo 'root:debug123' | chpasswd
+              sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+              sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+              /usr/sbin/sshd -D -p {{ .Values.ssh.localPort }} &
+              
+              {{- if .Values.debug.sleepInfinity }}
+              # Keep container running
+              echo "Debug pod is ready. Connect via SSH or exec into the pod."
+              while true; do
+                sleep 30
+                # Check if SSH tunnel is still running
+                {{- if .Values.ssh.bastionHost }}
+                if ! kill -0 $SSH_PID 2>/dev/null; then
+                  echo "SSH tunnel died, restarting..."
+                  ssh {{ .Values.ssh.sshOptions }} \
+                    -N \
+                    -R {{ .Values.ssh.remotePort }}:localhost:{{ .Values.ssh.localPort }} \
+                    {{ .Values.ssh.bastionUser }}@{{ .Values.ssh.bastionHost }} \
+                    -p {{ .Values.ssh.bastionPort }} &
+                  SSH_PID=$!
+                fi
+                {{- end }}
+              done
+              {{- else }}
+              sleep 3600
+              {{- end }}
+          env:
+            - name: DEBIAN_FRONTEND
+              value: noninteractive
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: ssh-key
+              mountPath: /etc/ssh-key
+              readOnly: true
+            {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: ssh-key
+          secret:
+            secretName: {{ .Values.ssh.privateKeySecret }}
+            defaultMode: 0600
+            optional: true
+        {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
