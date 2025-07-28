@@ -18,6 +18,19 @@ spec:
         {{- include "rag.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
     spec:
+      {{- if .Values.testing.delayDatabaseStartup }}
+      # Add init container to delay database startup for testing
+      initContainers:
+      - name: delay-startup
+        image: busybox:1.35
+        command: ['sh', '-c']
+        args:
+        - |
+          echo "Delaying database startup for testing resilience..."
+          echo "Waiting {{ .Values.testing.databaseDelaySeconds }} seconds to ensure RAG server starts first..."
+          sleep {{ .Values.testing.databaseDelaySeconds }}
+          echo "Database startup delay complete"
+      {{- end }}
       containers:
       - name: postgres
         image: pgvector/pgvector:pg16
