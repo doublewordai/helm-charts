@@ -98,3 +98,9 @@ ingress:
   #               name: onwards
   #               port:
   #                 number: 80
+
+# Metrics configuration - uses prometheus so relies on that already being installed into the cluster as will try to create a ServiceMonitor resource.
+metrics:
+  enabled: false
+  port: 8080
+  prefix: "onwards"
