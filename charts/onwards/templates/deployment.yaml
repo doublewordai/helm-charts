@@ -44,9 +44,9 @@ spec:
           {{- end }}
           {{- with .Values.ports }}
           ports:
-            {{- if and .Values.metrics.enabled }}
+            {{- if and $.Values.metrics.enabled }}
             - name: metrics
-              containerPort: {{ .Values.metrics.port }}
+              containerPort: {{ $.Values.metrics.port }}
               protocol: TCP
             {{- end }}
             {{- toYaml . | nindent 12 }}
