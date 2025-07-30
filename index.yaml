@@ -551,6 +551,16 @@ entries:
     version: 0.1.0
   onwards:
   - apiVersion: v2
+    appVersion: v0.3.0
+    created: "2025-07-30T17:12:28.372074613Z"
+    description: Onwards Helm Chart
+    digest: 083de914eab071a52d2c6efe6eff56ec5d66401d49e70c0c847f1e89ecc03b05
+    name: onwards
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/onwards-0.5.0/onwards-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
     appVersion: v0.2.0
     created: "2025-07-18T14:23:47.5654897Z"
     description: Onwards Helm Chart
@@ -1680,4 +1690,4 @@ entries:
     urls:
     - https://github.com/titanml/helm-charts/releases/download/takeoff-system-0.1.0/takeoff-system-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-24T12:37:39.176699559Z"
+generated: "2025-07-30T17:12:28.372388995Z"
