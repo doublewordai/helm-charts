@@ -74,7 +74,8 @@ service:
   enabled: true
   type: ClusterIP
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: 3000
 
