@@ -74,7 +74,8 @@ service:
   enabled: true
   type: ClusterIP
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: 3000
 
@@ -98,3 +99,9 @@ ingress:
   #               name: onwards
   #               port:
   #                 number: 80
+
+# Metrics configuration - uses prometheus so relies on that already being installed into the cluster as will try to create a ServiceMonitor resource.
+metrics:
+  enabled: false
+  port: 9090
+  prefix: "onwards"

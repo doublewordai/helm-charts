@@ -11,6 +11,12 @@ spec:
     {{- include "onwards.selectorLabels" . | nindent 4 }}
   ports:
     {{- toYaml .Values.service.ports | nindent 4 }}
+    {{- if .Values.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.metrics.port }}
+      targetPort: {{ .Values.metrics.port }}
+      protocol: TCP
+    {{- end }}
   type: {{ .Values.service.type }}
 {{- end }}
 {{- $ns := .Release.Namespace }}
