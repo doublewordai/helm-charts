@@ -1,0 +1,13 @@
+{{- range $name, $values := .Values.prometheusRules }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "observability.labels" $ | nindent 4 }}
+    {{ $values.additionalLabels | toYaml | nindent 4 }}
+spec:
+  {{- $values.spec | toYaml | nindent 2 }}
+---
+{{- end }}

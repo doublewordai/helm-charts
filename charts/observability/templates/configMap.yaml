@@ -1,0 +1,39 @@
+{{- if .Values.grafanaDashboard.rag }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rag-dashboard
+  labels:
+    grafana_dashboard: "1"
+    {{- include "observability.labels" . | nindent 4 }}
+data:
+  rag-dashboard.json: |-
+{{ .Files.Get "dashboards/rag.json" | indent 4 }}
+---
+{{- end }}
+{{- if .Values.grafanaDashboard.vllm }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lmcache-dashboard
+  namespace: {{ .Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+    {{- include "observability.labels" . | nindent 4 }}
+data:
+  lmcache-dashboard.json: |
+{{ .Files.Get "dashboards/lmcache.json" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lmcache-dashboard
+  namespace: {{ .Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+    {{- include "observability.labels" . | nindent 4 }}
+data:
+  vllm-dashboard: |
+{{ .Files.Get "dashboards/vllm.json" | indent 4 }}
+---
+{{- end }}
