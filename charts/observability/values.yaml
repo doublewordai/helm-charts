@@ -1,0 +1,168 @@
+fullnameOverride: ""
+nameOverride: ""
+
+# Which Grafana dashboards to enable
+grafanaDashboard:
+  rag: false
+  vllm: true
+
+# Map of PrometheusRule resources to create - each key is a unique identifier for the rule set.
+prometheusRules:
+  dev-alerts:
+    # Labels added to the PrometheusRule resource
+    additionalLabels:
+      team: dev-alerts
+      release: kube-prometheus-stack
+
+    spec:
+      groups:
+        # - name: RAG
+        #   rules:
+        #     - alert: RAG5xxErrors
+        #       expr: sum by (namespace, handler) (rate(helios_http_requests_total{status=~"5.."}[5m])) > 0
+        #       for: 1m
+        #       labels:
+        #         team: dev-alerts
+        #         severity: critical
+        #       annotations:
+        #         summary: "RAG returning 5xx errors in namespace {{ $labels.namespace }} for handler {{ $labels.handler }}"
+        #         description: "Rate of 5xx errors: {{ $value }} errors/sec"
+        #     - alert: LongDocumentProcessing
+        #       expr: increase(helios_documents_batch_processing_seconds_count[5m]) -
+        #             ignoring(le) increase(helios_documents_batch_processing_seconds_bucket{le="600.0"}[5m]) > 0
+        #       for: 1m
+        #       labels:
+        #         team: dev-alerts
+        #         severity: warning
+        #       annotations:
+        #         summary: "Document processing taking longer than 10 minutes in namespace {{ $labels.namespace }}"
+        #         description: "{{ $value }} documents took longer than 10 minutes to process"
+        #     - alert: DocumentProcessingFailure
+        #       expr: increase(helios_documents_failed_total[5m]) > 0
+        #       for: 1m
+        #       labels:
+        #         team: dev-alerts
+        #         severity: critical
+        #       annotations:
+        #         summary: "Document processing failures detected in namespace {{ $labels.namespace }}"
+        #         description: "{{ $value }} documents failed to process in the last 5 minutes"
+        - name: Onwards
+          rules:
+            - alert: OnwardsFailure
+              expr: sum by (namespace, exported_endpoint) (rate(onwards_http_requests_total{status=~"5.."}[5m])) > 0
+              for: 1m
+              labels:
+                team: dev-alerts
+                severity: critical
+              annotations:
+                summary: "Onwards service returning 5xx errors in namespace {{ $labels.namespace }} for endpoint {{ $labels.exported_endpoint }}"
+                description: "Rate of 5xx errors: {{ $value }} errors/sec"
+
+serviceMonitors:
+  global-vllm-metrics:
+    spec:
+      namespaceSelector:
+        any: true
+      selector:
+        matchExpressions:
+          - key: app.kubernetes.io/managed-by
+            operator: In
+            values:
+              - Helm
+          - key: environment
+            operator: In
+            values:
+              - test
+              - router
+          - key: release
+            operator: In
+            values:
+              - test
+              - router
+      endpoints:
+        - port: "service-port"
+        - port: "router-sport"
+
+kube-prometheus-stack:
+  enabled: true
+  prometheus:
+    serviceMonitor:
+      scrapeInterval: 15s
+
+    prometheusSpec:
+      retention: 1y
+
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+      scrapeConfigSelectorNilUsesHelmValues: false
+      ruleSelectorNilUsesHelmValues: false
+
+      storageSpec:
+        volumeClaimTemplate:
+          metadata:
+            name: prom
+          spec:
+            accessModes: [ "ReadWriteOnce" ]
+            resources:
+              requests:
+                storage: 100Gi
+
+  alertmanager:
+    enabled: true
+    alertmanagerSpec:
+      secrets:
+        - slack-webhook
+        - incident-io-webhook
+
+    config:
+      global:
+        resolve_timeout: 5m
+      route:
+        group_by: ['alertname', 'team']
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 12h
+        receiver: 'null'  # Default receiver for alerts that don't match any route
+        routes:
+        - matchers:
+          - team = "dev-alerts"
+          receiver: 'dev-alert-actions'
+      receivers:
+      - name: 'null'  # Null receiver - does nothing with alerts
+      - name: 'dev-alert-actions'
+        slack_configs:
+        # Slack webhook URL
+        - api_url_file: '/etc/alertmanager/secrets/slack-webhook/url'
+          channel: '#dev-alerts'
+          send_resolved: false
+          title: 'Elements - {{ .GroupLabels.alertname }}'
+          text: |
+            {{ range .Alerts }}
+            *Alert:* {{ .Annotations.summary }}
+            *Severity:* {{ .Labels.severity }}
+            *Namespace:* {{ .Labels.namespace }}
+            {{ if .Labels.handler }}*Handler:* {{ .Labels.handler }}{{ end }}
+            {{ if .Labels.exported_endpoint }}*Endpoint:* {{ .Labels.exported_endpoint }}{{ end }}
+            *Started:* {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+            {{ end }}
+      # Incident.io integration
+        webhook_configs:
+          - url_file: '/etc/alertmanager/secrets/incident-io-webhook/url'
+            send_resolved: false
+            http_config:
+              authorization:
+                credentials_file: '/etc/alertmanager/secrets/incident-io-webhook/token'
+
+  defaultRules:
+    create: false
+
+  grafana:
+    enabled: true
+
+    grafana.ini:
+      unified_alerting:
+        enabled: true
+
+      security:
+        allow_embedding: true
