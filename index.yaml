@@ -552,6 +552,21 @@ entries:
   observability:
   - apiVersion: v2
     appVersion: 75.12.0
+    created: "2025-08-01T12:01:20.401549201Z"
+    dependencies:
+    - condition: kube-prometheus-stack.enabled
+      name: kube-prometheus-stack
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 75.12.0
+    description: Helm chart for observability tools for Doubleword AI deployments.
+    digest: a3a8fadaf213b763ccd3642a5f4873a77637975ff9df6fc763916fb71292aaef
+    name: observability
+    type: application
+    urls:
+    - https://github.com/doublewordai/helm-charts/releases/download/observability-1.0.1/observability-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
+    appVersion: 75.12.0
     created: "2025-07-31T16:36:10.872276945Z"
     dependencies:
     - condition: kube-prometheus-stack.enabled
@@ -1706,4 +1721,4 @@ entries:
     urls:
     - https://github.com/titanml/helm-charts/releases/download/takeoff-system-0.1.0/takeoff-system-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-31T16:36:10.872502095Z"
+generated: "2025-08-01T12:01:20.401794033Z"
