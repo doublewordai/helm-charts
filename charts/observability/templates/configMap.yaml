@@ -33,7 +33,7 @@ metadata:
     grafana_dashboard: "1"
     {{- include "observability.labels" . | nindent 4 }}
 data:
-  vllm-dashboard: |
+  vllm-dashboard.json: |
 {{ .Files.Get "dashboards/vllm.json" | indent 4 }}
 ---
 {{- end }}
