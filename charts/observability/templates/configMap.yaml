@@ -27,7 +27,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: lmcache-dashboard
+  name: vllm-dashboard
   namespace: {{ .Release.Namespace }}
   labels:
     grafana_dashboard: "1"
