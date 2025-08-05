@@ -36,3 +36,8 @@ jobs:
         working-directory: ./charts/onwards
         run: |
           helm lint .
+
+      - name: Run Helm lint for observability
+        working-directory: ./charts/observability
+        run: |
+          helm lint .

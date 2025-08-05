@@ -1,0 +1,12 @@
+{{- range $name, $serviceMonitor := .Values.serviceMonitors }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "observability.labels" $ | nindent 4 }}
+spec:
+  {{- $serviceMonitor.spec | toYaml | nindent 2 }}
+---
+{{- end }}

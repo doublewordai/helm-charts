@@ -44,6 +44,11 @@ spec:
           {{- end }}
           {{- with .Values.ports }}
           ports:
+            {{- if and $.Values.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ $.Values.metrics.port }}
+              protocol: TCP
+            {{- end }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.livenessProbe }}
@@ -64,6 +69,15 @@ spec:
           {{- end }}
           args:
             - "-f=/app/config/config.json"
+            {{- if .Values.metrics.enabled }}
+            - "--metrics"
+            {{- with .Values.metrics.port }}
+            - "--metrics-port={{ . }}"
+            {{- end }}
+            {{- with .Values.metrics.prefix }}
+            - "--metrics-prefix={{ . }}"
+            {{- end }}
+            {{- end }}
           volumeMounts:
             - name: config-volume
               mountPath: /app/config
