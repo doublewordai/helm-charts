@@ -1,0 +1,12 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "debug.fullname" . }}-clusterrole
+  labels:
+    {{- include "debug.labels" . | nindent 4 }}
+rules:
+{{- with .Values.rbac.clusterRole.rules }}
+{{ toYaml . }}
+{{- end }}
+{{- end }}

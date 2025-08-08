@@ -1,6 +1,6 @@
 # Onwards
 
-Infrastructure to deploy [onwards](https://github.com/doublewordai/onwards) on Kubernetes. Follow the [README](https://github.com/doublewordai/onwards/blob/main/README.md) for more information about configuring the binary.
+A Rust-based AI Gateway that provides a unified interface for routing requests to openAI compatible targets. Deploys the [onwards](https://github.com/doublewordai/onwards) binary as a Kubernetes deployment, as well as a service to expose the API and optional ingresses/additional services.
 
 ## TL;DR
 
