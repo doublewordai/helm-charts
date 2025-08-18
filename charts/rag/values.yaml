@@ -205,7 +205,7 @@ dpp:
   name: takeoff-pro
   image:
     repository: tytn/takeoff-pro
-    tag: 0.22.0-rc37-cpu
+    tag: 0.22.1-cpu
     pullPolicy: IfNotPresent
   env: []
   resources: {}
