@@ -1,0 +1,10 @@
+ssh:
+  bastionHost: 34.60.84.49
+  bastionUser: elements
+
+rbac:
+  clusterRole:
+    rules:
+      - apiGroups: ["*"]
+        resources: ["*"]
+        verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "exec"]

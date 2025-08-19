@@ -7,37 +7,30 @@ replicaCount: 1
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: ubuntu
+  repository: tytn/debug
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.04"
+  tag: ""
 
 # SSH configuration for reverse tunnel
 ssh:
   # SSH server hostname/IP of the bastion host
-  bastionHost: ""
+  bastionHost: "host.example.com"
   # SSH server port on the bastion host
   bastionPort: 22
   # SSH username for the bastion host
-  bastionUser: ""
+  bastionUser: "bastion_user"
   # Local port to bind for reverse tunnel
   localPort: 2222
   # Remote port on bastion to forward to
   remotePort: 22
   # SSH private key (base64 encoded) - should be provided via secret
   privateKeySecret: "debug-ssh-key"
+  # SSH private key (base64 encoded) - should be provided via secret
+  privateKeyName: "ssh_host_key"
   # Additional SSH options
   sshOptions: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=30 -o ServerAliveCountMax=3"
-
-# Debug pod configuration
-debug:
-  # Keep the pod running indefinitely
-  sleepInfinity: true
-  # Install additional tools
-  installTools: true
-  # Tools to install (space-separated)
-  tools: "curl wget jq kubectl helm"
 
 # RBAC configuration
 rbac:

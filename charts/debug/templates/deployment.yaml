@@ -30,6 +30,21 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      initContainers:
+      - name: fix-ssh-perms
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        command:
+          - sh
+          - -c
+          - |
+            set -eux
+            mkdir -p /ssh
+            cp /ro/{{ .Values.ssh.privateKeyName }} /ssh/id_rsa
+            chmod 600 /ssh/id_rsa
+            chown 1001:1001 /ssh/id_rsa
+        volumeMounts:
+          - { name: ssh-key-ro, mountPath: /ro }
+          - { name: ssh-key-rw, mountPath: /ssh }
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -43,75 +58,33 @@ spec:
             - -c
             - |
               set -e
-              
-              # Update package list and install required packages
-              apt-get update
-              apt-get install -y openssh-client curl wget jq
-              
-              {{- if .Values.debug.installTools }}
-              # Install kubectl
-              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-              chmod +x kubectl
-              mv kubectl /usr/local/bin/
-              
-              # Install helm
-              curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-              chmod 700 get_helm.sh
-              ./get_helm.sh
-              {{- end }}
-              
-              # Setup SSH directory
-              mkdir -p /root/.ssh
-              chmod 700 /root/.ssh
-              
-              # Copy SSH private key from secret if available
-              if [ -f /etc/ssh-key/ssh-privatekey ]; then
-                cp /etc/ssh-key/ssh-privatekey /root/.ssh/id_rsa
-                chmod 600 /root/.ssh/id_rsa
+
+              # 1) make sure host keys exist - never bake them into the image
+              if [ ! -f /home/dev/.ssh/id_rsa ]; then
+                echo "No SSH host keys found, exiting..."
+                exit 1
               fi
-              
-              # Start SSH reverse tunnel if bastion host is configured
-              {{- if .Values.ssh.bastionHost }}
-              echo "Starting SSH reverse tunnel to {{ .Values.ssh.bastionHost }}..."
-              ssh {{ .Values.ssh.sshOptions }} \
-                -N \
+
+              ls -la /home/dev/.ssh
+              cat /home/dev/.ssh/id_rsa
+
+              if ! ssh-keygen -l -f /home/dev/.ssh/id_rsa >/dev/null 2>&1; then
+                echo "[fatal] private key is invalid - check your Secret" >&2
+                exit 1
+              fi
+
+              # 2) launch sshd on a high port (non-root)
+              echo "[sshd] starting …"
+              sudo /usr/sbin/sshd -p {{ .Values.ssh.localPort }} -D &             # backgrounded; logs to stdout
+
+              # 3) start the reverse tunnel and babysit it forever
+              echo "[autossh] opening reverse tunnel …"
+              autossh \
+                -M 0 -N \
+                -i /home/dev/.ssh/id_rsa \
                 -R {{ .Values.ssh.remotePort }}:localhost:{{ .Values.ssh.localPort }} \
                 {{ .Values.ssh.bastionUser }}@{{ .Values.ssh.bastionHost }} \
-                -p {{ .Values.ssh.bastionPort }} &
-              
-              SSH_PID=$!
-              echo "SSH tunnel started with PID: $SSH_PID"
-              {{- end }}
-              
-              # Start SSH server for incoming connections
-              apt-get install -y openssh-server
-              mkdir -p /var/run/sshd
-              echo 'root:debug123' | chpasswd
-              sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-              sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
-              /usr/sbin/sshd -D -p {{ .Values.ssh.localPort }} &
-              
-              {{- if .Values.debug.sleepInfinity }}
-              # Keep container running
-              echo "Debug pod is ready. Connect via SSH or exec into the pod."
-              while true; do
-                sleep 30
-                # Check if SSH tunnel is still running
-                {{- if .Values.ssh.bastionHost }}
-                if ! kill -0 $SSH_PID 2>/dev/null; then
-                  echo "SSH tunnel died, restarting..."
-                  ssh {{ .Values.ssh.sshOptions }} \
-                    -N \
-                    -R {{ .Values.ssh.remotePort }}:localhost:{{ .Values.ssh.localPort }} \
-                    {{ .Values.ssh.bastionUser }}@{{ .Values.ssh.bastionHost }} \
-                    -p {{ .Values.ssh.bastionPort }} &
-                  SSH_PID=$!
-                fi
-                {{- end }}
-              done
-              {{- else }}
-              sleep 3600
-              {{- end }}
+                {{ .Values.ssh.sshOptions }}
           env:
             - name: DEBIAN_FRONTEND
               value: noninteractive
@@ -120,18 +93,19 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: ssh-key
-              mountPath: /etc/ssh-key
+            - name: ssh-key-rw
+              mountPath: /home/dev/.ssh
               readOnly: true
             {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
-        - name: ssh-key
+        - name: ssh-key-ro
           secret:
             secretName: {{ .Values.ssh.privateKeySecret }}
-            defaultMode: 0600
-            optional: true
+            defaultMode: 0400
+        - name: ssh-key-rw
+          emptyDir: {}
         {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

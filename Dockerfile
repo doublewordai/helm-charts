@@ -87,6 +87,7 @@ RUN --mount=type=cache,target=/var/cache/apt,rw,sharing=private --mount=type=cac
   socat \
   apt-transport-https \
   unzip \
+  autossh \
   && sudo rm -rf /var/lib/apt/lists/*
 
 # Set up Python 3.11 in /usr/local
