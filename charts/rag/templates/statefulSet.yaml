@@ -53,7 +53,8 @@ spec:
   - metadata:
       name: {{ include "rag.fullname" $ }}-postgres
       labels:
-        {{- include "rag.labels" . | nindent 8 }}
+        app.kubernetes.io/name: {{ include "rag.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: {{ include "rag.fullname" $ }}-db
     spec:
       accessModes: [ "ReadWriteOnce" ]
